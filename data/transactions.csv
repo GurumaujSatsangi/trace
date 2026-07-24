@@ -1,0 +1,7 @@
+transaction_id,account_id,customer_name,amount,currency,transaction_type,timestamp,location
+T1001,ACC-101,Alice Smith,250.00,USD,POS,2026-06-01 10:15:00,New York
+T1002,ACC-4521,Robert Taylor,9500.00,USD,Cash Deposit,2026-06-02 11:00:00,Chicago
+T1003,ACC-4521,Robert Taylor,9800.00,USD,Cash Deposit,2026-06-02 14:30:00,Chicago
+T1004,ACC-4521,Robert Taylor,9200.00,USD,Cash Deposit,2026-06-03 09:10:00,Chicago
+T1005,ACC-202,Maria Garcia,1200.50,USD,Wire Transfer,2026-06-03 12:00:00,Miami
+T1006,ACC-303,James Smith,45.00,USD,ATM Withdrawal,2026-06-04 18:20:00,Los Angeles
