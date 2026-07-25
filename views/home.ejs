@@ -348,6 +348,17 @@
                         aiHtml += `<div class="verdict-box">${result.complianceVerdict.replace(/\n/g, '<br>')}</div>`;
                     }
 
+                    const highRiskTxns = result.results.filter(r => r.risk_level && r.risk_level.toUpperCase() === 'HIGH');
+                    if (highRiskTxns.length > 0) {
+                        // Use the first high risk transaction for the SAR report by default
+                        const txnData = encodeURIComponent(JSON.stringify(highRiskTxns[0]));
+                        const verdictData = encodeURIComponent(result.complianceVerdict || "");
+                        aiHtml += `<button style="margin-top: 10px; background-color: #dc2626; color: white; font-weight: bold; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 6px;" onclick="downloadSAR('${txnData}', '${verdictData}')">
+                                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                      Download SAR
+                                   </button>`;
+                    }
+
                     appendAiMessage(aiHtml);
                 } else if (result.error === "RATE_LIMIT" || response.status === 429) {
                     const waitTime = result.retryAfter || 15;
@@ -590,7 +601,38 @@
         }
 
         function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        async function downloadSAR(txnDataEncoded, verdictEncoded) {
+            try {
+                const transaction = JSON.parse(decodeURIComponent(txnDataEncoded));
+                const verdict = decodeURIComponent(verdictEncoded);
+
+                const response = await fetch('/api/sar/download', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ transaction, verdict })
+                });
+
+                if (!response.ok) {
+                    throw new Error("Failed to download SAR");
+                }
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = `SAR_${transaction.transaction_id || 'Report'}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+            } catch (error) {
+                console.error("SAR Download Error:", error);
+                alert("Could not generate SAR. Please try again.");
+            }
         }
     </script>
 </body>
