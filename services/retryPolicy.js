@@ -12,7 +12,7 @@ export function isTimeoutError(error) {
     );
 }
 
-export function isGroqRetryableError(error) {
+export function isOpenAIRetryableError(error) {
     if (!error) return false;
     const status = String(
         error.status || error.response?.status || error.statusCode || error.error?.status || ""

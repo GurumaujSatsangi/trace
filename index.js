@@ -6,7 +6,7 @@ import fs from "fs";
 import csv from "csv-parser";
 import { createClient } from "@supabase/supabase-js";
 import "dotenv/config";
-import { ChatGroq } from "@langchain/groq";
+import { ChatOpenAI } from "@langchain/openai";
 import { graph } from "./agents/graph.js";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import duckdb from "duckdb";
@@ -140,9 +140,9 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-const model = new ChatGroq({
+const model = new ChatOpenAI({
     apiKey: process.env.API_KEY,
-    model: "llama-3.3-70b-versatile",
+    modelName: "gpt-4o",
     temperature: 0
 });
 
@@ -251,6 +251,29 @@ app.post("/api/upload", upload.single("csvFile"), async (req, res) => {
     }
 });
 
+app.get("/api/reports", async (req, res) => {
+    try {
+        const { data, error } = await supabase.from('compliance_reports').select('*');
+        if (error) throw error;
+        return res.json({ success: true, reports: data });
+    } catch (err) {
+        console.error("Error fetching reports:", err);
+        return res.status(500).json({ error: "Failed to fetch reports" });
+    }
+});
+
+app.get("/api/transactions/:account_id", async (req, res) => {
+    try {
+        const accountId = req.params.account_id;
+        const { data, error } = await supabase.from('transactions').select('*').eq('account_id', accountId);
+        if (error) throw error;
+        return res.json({ success: true, transactions: data });
+    } catch (err) {
+        console.error("Error fetching transactions:", err);
+        return res.status(500).json({ error: "Failed to fetch transactions" });
+    }
+});
+
 app.post("/api/chat", async (req, res) => {
     try {
         const { message } = req.body;
@@ -275,7 +298,8 @@ The database has two tables:
 1. transactions: ${txColumns}
 2. compliance_reports: ${reportsColumns}
 Write a valid DuckDB SQL query that answers the user's request.
-IMPORTANT: Always select key identifying columns (like account_id, transaction_id, customer_name) so the context is clear. Prefer SELECT * unless specifically asked to aggregate.
+IMPORTANT: DO NOT use SELECT *. You MUST select only the specific columns needed to answer the question, as the full rows are too large for the context window (especially avoid graph_state and enrichment_data). Always include identifying columns like account_id and transaction_id so the context is clear.
+IMPORTANT: For filtering by risk_level, the exact string values are 'HIGH', 'MEDIUM', 'LOW' (all caps). Use ILIKE for text matching to be safe.
 Return ONLY the raw SQL query string with no markdown and no extra text.`;
 
         const sqlAiResponse = await model.invoke([
@@ -289,42 +313,58 @@ Return ONLY the raw SQL query string with no markdown and no extra text.`;
             .replace(/^```\s*/i, "")
             .replace(/\s*```$/i, "");
 
+        console.log("SQL Generated for chat query:", generatedSql);
+
         let queryResults;
 
         try {
             queryResults = await runDuckQuery(generatedSql);
         } catch (dbError) {
             return res.status(400).json({
-                error: "Generated SQL execution failed.",
-                sql: generatedSql,
-                details: dbError.message
+                error: "SQL_ERROR"
             });
         }
 
         const analysisSystemPrompt = `You are TRACE, an expert Anti-Money Laundering (AML) compliance officer.
 User Question: "${message}"
 Retrieved Data (Result of the database query for the user's question):
-${JSON.stringify(queryResults, null, 2)}
+${JSON.stringify(queryResults, (key, value) => typeof value === 'bigint' ? value.toString() : value, 2)}
 
 Analyze these records for suspicious patterns and provide a professional compliance verdict.
 Note: The retrieved data directly corresponds to the User Question, even if certain identifying columns (like account_id) were omitted from the SQL SELECT clause.
-Do not invent facts that are not present in the retrieved data.`;
+Do not invent facts that are not present in the retrieved data.
+Return the sources from news screening and PEP only when necessary.
+Do NOT use asterisks (**) for bold formatting.`;
 
         const analysisAiResponse = await model.invoke([
             new SystemMessage(analysisSystemPrompt),
             new HumanMessage("Evaluate the retrieved data.")
         ]);
 
+        const verdict = analysisAiResponse.content.replace(/\*\*/g, '');
+
         return res.json({
             success: true,
             query: message,
             sql: generatedSql,
             results: queryResults,
-            complianceVerdict: analysisAiResponse.content,
+            complianceVerdict: verdict,
             timestamp: new Date().toISOString()
         });
     } catch (error) {
         console.error("Error processing chat request:", error);
+        
+        if (error.message && error.message.includes("429")) {
+            let retryAfterSeconds = 15;
+            const match = error.message.match(/try again in (?:([0-9]+)m)?([0-9\.]+)s/);
+            if (match) {
+                const minutes = match[1] ? parseFloat(match[1]) : 0;
+                const seconds = parseFloat(match[2]);
+                retryAfterSeconds = Math.ceil((minutes * 60) + seconds);
+            }
+            return res.status(429).json({ error: "RATE_LIMIT", retryAfter: retryAfterSeconds });
+        }
+
         return res.status(500).json({ error: "Internal server error during processing.", details: error.message });
     }
 });

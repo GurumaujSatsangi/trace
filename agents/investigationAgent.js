@@ -1,18 +1,18 @@
-import { ChatGroq } from "@langchain/groq";
+import { ChatOpenAI } from "@langchain/openai";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import "dotenv/config";
-import { executeWithRetry, isGroqRetryableError } from "../services/retryPolicy.js";
+import { executeWithRetry, isOpenAIRetryableError } from "../services/retryPolicy.js";
 
-const primaryModel = new ChatGroq({
+const primaryModel = new ChatOpenAI({
     apiKey: process.env.API_KEY,
-    model: "llama-3.1-8b-instant",
+    modelName: "gpt-4o-mini",
     temperature: 0,
     maxRetries: 0
 });
 
-const fallbackModel = new ChatGroq({
+const fallbackModel = new ChatOpenAI({
     apiKey: process.env.API_KEY,
-    model: "llama-3.1-8b-instant",
+    modelName: "gpt-4o",
     temperature: 0,
     maxRetries: 0
 });
@@ -113,9 +113,9 @@ export async function investigationAgent(state) {
                 fn: () => primaryModel.invoke(messages),
                 maxRetries: 1,
                 backoff: [1000],
-                isRetryable: isGroqRetryableError,
-                fallbackValue: null,
-                apiName: "Groq Primary (llama-3.3-70b-versatile)"
+                isRetryable: isOpenAIRetryableError,
+                timeout: 10000,
+                apiName: "OpenAI Primary (gpt-4o-mini)"
             });
 
             totalApiCalls += res.apiCalls;
@@ -127,9 +127,9 @@ export async function investigationAgent(state) {
                     fn: () => fallbackModel.invoke(messages),
                     maxRetries: 1,
                     backoff: [1000],
-                    isRetryable: isGroqRetryableError,
-                    fallbackValue: null,
-                    apiName: "Groq Fallback (llama-3.1-8b-instant)"
+                    isRetryable: isOpenAIRetryableError,
+                    timeout: 20000,
+                    apiName: "OpenAI Fallback (gpt-4o)"
                 });
 
                 totalApiCalls += fallbackRes.apiCalls;
@@ -148,7 +148,7 @@ export async function investigationAgent(state) {
                     }
                 };
             } else {
-                failedApisList.push("Groq");
+                failedApisList.push("OpenAI");
                 investigatedReports[index] = {
                     ...report,
                     investigation: {

@@ -23,9 +23,10 @@ export async function adverseMediaSearch(name) {
         // 1. Try NewsAPI if API key exists and is not rate-limited
         if (process.env.NEWS_API && !newsApiRateLimited) {
             try {
+                const queryStr = `"${trimmedName}" AND (fraud OR "money laundering" OR crime OR scam OR illegal OR corruption OR finance)`;
                 const response = await axios.get("https://newsapi.org/v2/everything", {
                     params: {
-                        q: `"${trimmedName}"`,
+                        q: queryStr,
                         apiKey: process.env.NEWS_API,
                         pageSize: 5
                     },
@@ -54,7 +55,8 @@ export async function adverseMediaSearch(name) {
 
         // 2. Fallback to GDELT Public Adverse Media API (Free, no rate limits, no API key required)
         try {
-            const gdeltUrl = `https://api.gdeltproject.org/api/v2/doc/doc?query=${encodeURIComponent('"' + trimmedName + '"')}&mode=artlist&maxrecords=5&format=json`;
+            const gdeltQuery = `"${trimmedName}" (fraud OR laundering OR crime OR scam OR illegal OR corruption OR finance)`;
+            const gdeltUrl = `https://api.gdeltproject.org/api/v2/doc/doc?query=${encodeURIComponent(gdeltQuery)}&mode=artlist&maxrecords=5&format=json`;
             const response = await axios.get(gdeltUrl, { timeout: 5000 });
 
             const articles = Array.isArray(response.data?.articles)

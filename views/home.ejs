@@ -82,7 +82,7 @@
         }
 
         /* AI Message Rich Content Elements */
-        .verdict-box { background: #f0fdf4; border: 1px solid #bbf7d0; padding: 16px; border-radius: 8px; margin-bottom: 16px; color: #166534; font-size: 14.5px; }
+        .verdict-box { background: #ffffff; border: 1px solid #e5e7eb; padding: 16px; border-radius: 8px; margin-bottom: 16px; color: #1f2937; font-size: 14.5px; }
         table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 16px; background: white; }
         th, td { border: 1px solid #e5e7eb; padding: 10px 14px; text-align: left; }
         th { background: #f8fafc; font-weight: 600; color: #475569; }
@@ -116,6 +116,27 @@
         .spinner-small { width: 14px; height: 14px; border: 2px solid #93c5fd; border-top-color: #2563eb; border-radius: 50%; animation: spin 0.8s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
+        /* Tabular View & Modals */
+        #tabularView { flex: 1; padding: 40px; overflow-y: auto; display: none; background: #f9fafb; }
+        #tabularView h2 { margin-top: 0; margin-bottom: 24px; color: #111827; }
+        .reports-table { width: 100%; border-collapse: collapse; background: white; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; font-size: 14px; }
+        .reports-table th, .reports-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #e5e7eb; }
+        .reports-table th { background: #f3f4f6; font-weight: 600; color: #374151; }
+        .reports-table tr:last-child td { border-bottom: none; }
+        .reports-table tr:hover { background: #f8fafc; }
+        .reports-table a { color: #2563eb; text-decoration: none; cursor: pointer; font-weight: 500; }
+        .reports-table a:hover { text-decoration: underline; }
+        .btn-view-details { background: #e0e7ff; color: #4338ca; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500; transition: 0.2s; }
+        .btn-view-details:hover { background: #c7d2fe; }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; width: 85%; max-width: 900px; max-height: 85vh; border-radius: 8px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
+        .modal-header { padding: 16px 20px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; background: #f8fafc; }
+        .modal-header h3 { margin: 0; color: #0f172a; font-size: 18px; }
+        .close-modal { background: none; border: none; font-size: 24px; cursor: pointer; color: #64748b; line-height: 1; padding: 0; }
+        .close-modal:hover { color: #0f172a; }
+        .modal-body { padding: 20px; overflow-y: auto; flex: 1; }
+        .json-pre { background: #0f172a; color: #e2e8f0; padding: 16px; border-radius: 8px; overflow-x: auto; margin: 0; font-size: 13.5px; line-height: 1.5; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
     </style>
 </head>
 <body>
@@ -135,10 +156,16 @@
                 </form>
                 <div id="uploadStatus" style="display: none;"></div>
             </div>
+
+            <div class="sidebar-section" style="margin-top: 24px;">
+                <h3>2. Views</h3>
+                <button type="button" id="chatViewBtn" class="btn-sidebar" style="margin-bottom: 12px;">Chat View</button>
+                <button type="button" id="tabViewBtn" class="btn-sidebar" style="background: #374151;">Tabular View</button>
+            </div>
         </aside>
 
         <!-- Main Chat Area -->
-        <main class="chat-container">
+        <main class="chat-container" id="chatView">
             <div class="chat-history" id="chatHistory">
                 <!-- Welcome Message -->
                 <div class="message ai">
@@ -160,6 +187,52 @@
                 </form>
             </div>
         </main>
+
+        <!-- Tabular View Area -->
+        <main id="tabularView">
+            <h2>Compliance Reports</h2>
+            <div style="overflow-x: auto; border-radius: 8px; border: 1px solid #e5e7eb;">
+                <table class="reports-table">
+                    <thead>
+                        <tr>
+                            <th>Account ID</th>
+                            <th>Transaction ID</th>
+                            <th>Risk Score</th>
+                            <th>Risk Level</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reportsTableBody">
+                        <tr><td colspan="5" style="text-align: center; color: #64748b;">No data loaded.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="reportModal" class="modal-overlay" onclick="if(event.target===this) closeModal('reportModal')">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="reportModalTitle">Compliance Report Details</h3>
+                <button class="close-modal" onclick="closeModal('reportModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="reportModalContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="transactionModal" class="modal-overlay" onclick="if(event.target===this) closeModal('transactionModal')">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="transactionModalTitle">Transaction Details</h3>
+                <button class="close-modal" onclick="closeModal('transactionModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="transactionModalContent"></div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -218,15 +291,15 @@
                 const result = await response.json();
                 
                 if (response.ok) {
-                    statusEl.textContent = \`✓ \${result.message}\`;
+                    statusEl.textContent = `✓ ${result.message}`;
                     statusEl.className = "success";
-                    appendAiMessage(\`<strong>Dataset Uploaded Successfully</strong><br>Parsed and synced \${result.totalInserted} records. I am ready to answer your questions!\`);
+                    appendAiMessage(`<strong>Dataset Uploaded Successfully</strong><br>Parsed and synced ${result.totalInserted} records. I am ready to answer your questions!`);
                 } else {
-                    statusEl.textContent = \`✗ Error: \${result.error || 'Upload failed'}\`;
+                    statusEl.textContent = `✗ Error: ${result.error || 'Upload failed'}`;
                     statusEl.className = "error";
                 }
             } catch (err) {
-                statusEl.textContent = \`✗ Network error during upload.\`;
+                statusEl.textContent = `✗ Network error during upload.`;
                 statusEl.className = "error";
             } finally {
                 submitBtn.disabled = false;
@@ -249,12 +322,12 @@
             submitBtn.disabled = true;
 
             // Show Loading Indicator in Chat
-            const loader = appendAiMessage(\`
+            const loader = appendAiMessage(`
                 <div class="loading-badge" id="activeLoader">
                     <div class="spinner-small"></div>
                     Evaluating AML patterns...
                 </div>
-            \`);
+            `);
 
             try {
                 const response = await fetch('/api/chat', {
@@ -272,45 +345,47 @@
 
                     // Verdict
                     if (result.complianceVerdict) {
-                        aiHtml += \`<div class="verdict-box">\${result.complianceVerdict.replace(/\\n/g, '<br>')}</div>\`;
-                    }
-
-                    // Results Table
-                    if (Array.isArray(result.results) && result.results.length > 0) {
-                        const headers = Object.keys(result.results[0]);
-                        const thead = \`<tr>\${headers.map(h => \`<th>\${h}</th>\`).join('')}</tr>\`;
-                        const tbody = result.results.map(row => 
-                            \`<tr>\${headers.map(h => \`<td>\${row[h] !== null ? row[h] : ''}</td>\`).join('')}</tr>\`
-                        ).join('');
-                        
-                        aiHtml += \`
-                        <div class="table-responsive">
-                            <table>
-                                <thead>\${thead}</thead>
-                                <tbody>\${tbody}</tbody>
-                            </table>
-                        </div>\`;
-                    } else if (Array.isArray(result.results)) {
-                        aiHtml += \`<div style="margin-bottom: 16px; color: #64748b;">No matching records found.</div>\`;
-                    }
-
-                    // SQL Snippet
-                    if (result.sql) {
-                        aiHtml += \`
-                        <div class="sql-header">Generated DuckDB SQL</div>
-                        <pre class="sql-pre">\${result.sql}</pre>\`;
+                        aiHtml += `<div class="verdict-box">${result.complianceVerdict.replace(/\n/g, '<br>')}</div>`;
                     }
 
                     appendAiMessage(aiHtml);
+                } else if (result.error === "RATE_LIMIT" || response.status === 429) {
+                    const waitTime = result.retryAfter || 15;
+                    const msgId = 'countdown-' + Date.now();
+                    appendAiMessage(`<div style="color: #ea580c; font-weight: 500; font-size: 14.5px;">Rate limit reached. Please wait <span id="${msgId}">${waitTime}</span> seconds before sending another message.</div>`);
+                    
+                    submitBtn.setAttribute('data-rate-limited', 'true');
+                    submitBtn.disabled = true;
+                    messageInput.disabled = true;
+                    
+                    let timeLeft = waitTime;
+                    const interval = setInterval(() => {
+                        timeLeft -= 1;
+                        const counterEl = document.getElementById(msgId);
+                        if (counterEl) {
+                            counterEl.textContent = Math.max(0, timeLeft);
+                        }
+                        if (timeLeft <= 0) {
+                            clearInterval(interval);
+                            submitBtn.removeAttribute('data-rate-limited');
+                            submitBtn.disabled = false;
+                            messageInput.disabled = false;
+                            messageInput.focus();
+                        }
+                    }, 1000);
+                } else if (result.error === "SQL_ERROR") {
+                    appendAiMessage(`<div style="color: #dc2626; font-weight: 500; font-size: 14.5px;">Please try again.</div>`);
                 } else {
-                    appendAiMessage(\`<div style="color: #dc2626; font-weight: 500;">Error:</div><pre class="sql-pre">\${JSON.stringify(result, null, 2)}</pre>\`);
+                    appendAiMessage(`<div style="color: #dc2626; font-weight: 500;">Error:</div><pre class="sql-pre">${JSON.stringify(result, null, 2)}</pre>`);
                 }
             } catch (err) {
                 loader.remove();
-                appendAiMessage(\`<div style="color: #dc2626; font-weight: 500;">Network Error processing chat request.</div>\`);
+                appendAiMessage(`<div style="color: #dc2626; font-weight: 500;">Network Error processing chat request.</div>`);
             } finally {
-                submitBtn.disabled = false;
-                messageInput.focus();
+                if (!submitBtn.hasAttribute('data-rate-limited')) {
+                    submitBtn.disabled = false;
+                    messageInput.focus();
+                }
             }
         });
 
@@ -318,9 +393,205 @@
         document.getElementById('messageInput').addEventListener('keydown', function(e) {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
-                chatForm.dispatchEvent(new Event('submit'));
+                chatForm.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
             }
         });
+
+        // View Toggling & Tabular Logic
+        const chatViewBtn = document.getElementById('chatViewBtn');
+        const tabViewBtn = document.getElementById('tabViewBtn');
+        const chatView = document.getElementById('chatView');
+        const tabularView = document.getElementById('tabularView');
+        let reportsCache = [];
+
+        chatViewBtn.addEventListener('click', () => {
+            chatView.style.display = 'flex';
+            tabularView.style.display = 'none';
+            chatViewBtn.style.background = 'var(--primary)';
+            tabViewBtn.style.background = '#374151';
+        });
+
+        tabViewBtn.addEventListener('click', () => {
+            chatView.style.display = 'none';
+            tabularView.style.display = 'block';
+            chatViewBtn.style.background = '#374151';
+            tabViewBtn.style.background = 'var(--primary)';
+            loadReports();
+        });
+
+        async function loadReports() {
+            const tbody = document.getElementById('reportsTableBody');
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 24px; color: #64748b;">Loading reports...</td></tr>';
+            try {
+                const res = await fetch('/api/reports');
+                const data = await res.json();
+                if (data.success && data.reports) {
+                    reportsCache = data.reports;
+                    renderReports(data.reports);
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #dc2626; padding: 24px;">Failed to load reports.</td></tr>';
+                }
+            } catch (err) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #dc2626; padding: 24px;">Error connecting to server.</td></tr>';
+            }
+        }
+
+        function renderReports(reports) {
+            const tbody = document.getElementById('reportsTableBody');
+            tbody.innerHTML = '';
+            
+            if (reports.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 24px; color: #64748b;">No compliance reports found. Please upload a dataset first.</td></tr>';
+                return;
+            }
+
+            reports.forEach((row, index) => {
+                const reportData = row.report || row; 
+                const qa = reportData.qa || {};
+                const tx = reportData.transaction || {};
+                
+                const accountId = row.account_id || tx.account_id || 'N/A';
+                const txId = row.transaction_id || tx.transaction_id || qa.transaction_id || 'N/A';
+                
+                let riskScore = 'N/A';
+                if (row.risk_score !== undefined && row.risk_score !== null) riskScore = row.risk_score;
+                else if (qa.risk_score !== undefined && qa.risk_score !== null) riskScore = qa.risk_score;
+
+                const riskLevel = row.risk_level || qa.risk_level || 'N/A';
+
+                const riskColor = riskLevel === 'HIGH' ? '#dc2626' : (riskLevel === 'MEDIUM' ? '#d97706' : '#16a34a');
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><a onclick="openTransactionModal('${accountId}')">${accountId}</a></td>
+                    <td>${txId}</td>
+                    <td>${riskScore}</td>
+                    <td><span style="font-weight: 600; color: ${riskColor}">${riskLevel}</span></td>
+                    <td><button class="btn-view-details" onclick="openReportModal(${index})">View Details</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function createTableFromJSON(obj, depth = 0) {
+            if (obj === null || obj === undefined) return '';
+            
+            let tableStyle = depth === 0 ? 'width: 100%;' : 'width: 100%; border: 1px solid #e5e7eb; margin: 4px 0; border-radius: 4px; box-shadow: none;';
+            let html = `<table class="reports-table" style="${tableStyle}">`;
+            
+            if (depth === 0) {
+                html += '<thead><tr><th style="width: 30%">Property</th><th>Value</th></tr></thead>';
+            }
+            html += '<tbody>';
+            
+            for (const [key, value] of Object.entries(obj)) {
+                let displayValue = '';
+                
+                if (key === 'flags' && Array.isArray(value)) {
+                    displayValue = '<div style="display: flex; gap: 8px; flex-wrap: wrap;">';
+                    value.forEach(flag => {
+                        displayValue += `<span style="background: #fee2e2; color: #991b1b; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600;">${String(flag).replace(/</g, '&lt;')}</span>`;
+                    });
+                    displayValue += '</div>';
+                } else if ((key === 'adverse_media_links' || key === 'links' || key === 'adverseMediaLinks') && Array.isArray(value)) {
+                    displayValue = '<div style="display: flex; flex-direction: column; gap: 6px;">';
+                    value.forEach(link => {
+                        if (typeof link === 'string' && (link.startsWith('http') || link.startsWith('www'))) {
+                            let url = link.startsWith('http') ? link : 'https://' + link;
+                            displayValue += `<div><a href="${url}" target="_blank" style="word-break: break-all; font-size: 13px;">${link}</a></div>`;
+                        } else if (typeof link === 'object') {
+                            displayValue += createTableFromJSON(link, depth + 1);
+                        } else {
+                            displayValue += `<div>${String(link).replace(/</g, '&lt;')}</div>`;
+                        }
+                    });
+                    displayValue += '</div>';
+                } else if (Array.isArray(value)) {
+                    displayValue = '<div style="display: flex; flex-direction: column; gap: 6px;">';
+                    value.forEach((item) => {
+                        if (typeof item === 'object' && item !== null) {
+                            displayValue += `<div>${createTableFromJSON(item, depth + 1)}</div>`;
+                        } else if (typeof item === 'string' && item.startsWith('http')) {
+                            displayValue += `<div><a href="${item}" target="_blank" style="word-break: break-all; font-size: 13px;">${item}</a></div>`;
+                        } else {
+                            displayValue += `<div>${String(item).replace(/</g, '&lt;')}</div>`;
+                        }
+                    });
+                    displayValue += '</div>';
+                } else if (typeof value === 'object' && value !== null) {
+                    displayValue = createTableFromJSON(value, depth + 1);
+                } else {
+                    let strVal = String(value);
+                    if (strVal.startsWith('http')) {
+                        displayValue = `<a href="${strVal}" target="_blank" style="word-break: break-all;">${strVal}</a>`;
+                    } else {
+                        displayValue = strVal.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
+                    }
+                }
+                
+                const displayKey = key.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+                
+                let tdKeyStyle = depth === 0 
+                    ? 'font-weight: 500; color: #374151; vertical-align: top;' 
+                    : 'font-weight: 500; color: #475569; vertical-align: top; background: #f8fafc; border-right: 1px solid #e5e7eb; width: 30%; padding: 8px 12px; font-size: 13px;';
+                
+                let tdValStyle = depth === 0 
+                    ? 'word-break: break-word; vertical-align: top;'
+                    : 'word-break: break-word; vertical-align: top; padding: 8px 12px; font-size: 13px; background: white;';
+                
+                html += `<tr><td style="${tdKeyStyle}">${displayKey}</td><td style="${tdValStyle}">${displayValue}</td></tr>`;
+            }
+            html += '</tbody></table>';
+            return html;
+        }
+
+        function openReportModal(index) {
+            const report = reportsCache[index];
+            document.getElementById('reportModalContent').innerHTML = createTableFromJSON(report);
+            document.getElementById('reportModal').style.display = 'flex';
+        }
+
+        async function openTransactionModal(accountId) {
+            if (accountId === 'N/A') return;
+            
+            const content = document.getElementById('transactionModalContent');
+            document.getElementById('transactionModalTitle').textContent = `Transactions for Account: ${accountId}`;
+            content.innerHTML = '<div style="padding: 20px; text-align: center; color: #64748b;">Loading transactions...</div>';
+            document.getElementById('transactionModal').style.display = 'flex';
+
+            try {
+                const res = await fetch(`/api/transactions/${accountId}`);
+                const data = await res.json();
+                if (data.success && data.transactions) {
+                    if (data.transactions.length > 0) {
+                        let html = '<div style="overflow-x: auto;"><table class="reports-table"><thead><tr>';
+                        const keys = Object.keys(data.transactions[0]).filter(k => k !== 'analysis_status' && k !== 'uploaded_at');
+                        keys.forEach(k => html += `<th>${k.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}</th>`);
+                        html += '</tr></thead><tbody>';
+                        
+                        data.transactions.forEach(tx => {
+                            html += '<tr>';
+                            keys.forEach(k => {
+                                html += `<td>${tx[k] !== null && tx[k] !== undefined ? String(tx[k]).replace(/</g, '&lt;') : ''}</td>`;
+                            });
+                            html += '</tr>';
+                        });
+                        html += '</tbody></table></div>';
+                        content.innerHTML = html;
+                    } else {
+                        content.innerHTML = '<div style="padding: 20px; text-align: center; color: #64748b;">No transactions found.</div>';
+                    }
+                } else {
+                    content.innerHTML = '<div style="padding: 20px; text-align: center; color: #dc2626;">Failed to load transaction data.</div>';
+                }
+            } catch (err) {
+                content.innerHTML = '<div style="padding: 20px; text-align: center; color: #dc2626;">Error connecting to server.</div>';
+            }
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
     </script>
 </body>
 </html>
