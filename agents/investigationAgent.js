@@ -5,14 +5,16 @@ import { executeWithRetry, isGroqRetryableError } from "../services/retryPolicy.
 
 const primaryModel = new ChatGroq({
     apiKey: process.env.API_KEY,
-    model: "llama-3.3-70b-versatile",
-    temperature: 0
+    model: "llama-3.1-8b-instant",
+    temperature: 0,
+    maxRetries: 0
 });
 
 const fallbackModel = new ChatGroq({
     apiKey: process.env.API_KEY,
     model: "llama-3.1-8b-instant",
-    temperature: 0
+    temperature: 0,
+    maxRetries: 0
 });
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -89,8 +91,8 @@ export async function investigationAgent(state) {
     let totalRetries = 0;
     const failedApisList = [];
 
-    // Worker pool for maximum 2 concurrent Groq requests
-    const concurrencyLimit = 2;
+    // Worker pool for maximum 5 concurrent Groq requests
+    const concurrencyLimit = 5;
     let cursor = 0;
 
     const workers = Array.from({ length: Math.min(concurrencyLimit, highRiskQueue.length) }, async () => {

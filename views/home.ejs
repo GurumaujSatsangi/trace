@@ -3,270 +3,212 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TRACE - Compliance Engine</title>
+    <title>TRACE - AI Compliance</title>
     <style>
         :root {
-            --primary: #2563eb;
-            --primary-hover: #1d4ed8;
-            --bg: #f8f9fa;
-            --card-bg: #ffffff;
-            --text: #333333;
-            --text-muted: #64748b;
+            --bg: #ffffff;
+            --sidebar-bg: #111827;
+            --sidebar-text: #f3f4f6;
+            --primary: #10b981;
+            --primary-hover: #059669;
             --border: #e5e7eb;
-            --success: #16a34a;
-            --error: #dc2626;
+            --user-msg: #f3f4f6;
+            --ai-msg: #ffffff;
+            --text-main: #1f2937;
         }
 
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 850px; margin: 40px auto; padding: 0 20px; background: var(--bg); color: var(--text); }
-        .card { background: var(--card-bg); padding: 24px; margin-bottom: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid var(--border); }
-        h1 { color: #1e293b; margin-bottom: 5px; }
-        h2 { margin-top: 0; color: #0f172a; font-size: 1.25rem; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; }
-        input[type="file"], textarea { width: 100%; padding: 12px; margin: 12px 0; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; font-size: 14px; }
-        textarea { height: 90px; resize: vertical; }
-        button { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; transition: background 0.2s, transform 0.1s; }
-        button:hover { background: var(--primary-hover); }
-        button:disabled { background: #94a3b8; cursor: not-allowed; }
-        pre { background: #0f172a; color: #e2e8f0; padding: 16px; border-radius: 8px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
-        .success { color: var(--success); font-weight: 600; margin-top: 8px; }
-        .error { color: var(--error); font-weight: 600; margin-top: 8px; }
-        .subtitle { color: var(--text-muted); margin-bottom: 24px; }
-
-        /* Loading Spinner & Progress Components */
-        .loading-container {
-            display: none;
-            background: #f0f7ff;
-            border: 1px solid #bfdbfe;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 16px 0;
-            animation: fadeIn 0.3s ease-in-out;
-        }
-
-        .loading-container.active {
-            display: block;
-        }
-
-        .loading-header {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            margin-bottom: 14px;
-        }
-
-        /* Dual-ring Animated Spinner */
-        .spinner {
-            width: 36px;
-            height: 36px;
-            min-width: 36px;
-            border: 4px solid #dbeafe;
-            border-top: 4px solid var(--primary);
-            border-right: 4px solid var(--primary);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-4px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .loading-details {
-            flex-grow: 1;
-        }
-
-        .loading-title {
-            font-weight: 600;
-            color: #1e3a8a;
-            font-size: 15px;
-            margin-bottom: 4px;
-        }
-
-        .current-action {
-            font-size: 13.5px;
-            color: #2563eb;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .timer-badge {
-            font-size: 12.5px;
-            background: #dbeafe;
-            color: #1e40af;
-            padding: 4px 10px;
-            border-radius: 16px;
-            font-weight: 600;
-            white-space: nowrap;
-        }
-
-        /* Progress Bar */
-        .progress-track {
-            width: 100%;
-            height: 8px;
-            background: #e2e8f0;
-            border-radius: 4px;
+        body, html {
+            margin: 0; padding: 0; height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg); color: var(--text-main);
             overflow: hidden;
-            margin-top: 10px;
         }
 
-        .progress-fill {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, #2563eb, #3b82f6);
-            border-radius: 4px;
-            transition: width 0.4s ease;
+        .app-container {
+            display: flex; height: 100vh;
         }
+
+        /* Sidebar */
+        .sidebar {
+            width: 320px; background: var(--sidebar-bg); color: var(--sidebar-text);
+            display: flex; flex-direction: column; padding: 24px; box-sizing: border-box;
+            border-right: 1px solid #1f2937;
+        }
+
+        .sidebar-header h2 { margin: 0 0 4px 0; font-size: 24px; color: white; letter-spacing: 1px; }
+        .sidebar-header p { margin: 0 0 30px 0; font-size: 13px; color: #9ca3af; }
+
+        .sidebar-section h3 { font-size: 12px; text-transform: uppercase; color: #6b7280; letter-spacing: 1px; margin-bottom: 12px; }
+        
+        input[type="file"] { width: 100%; padding: 10px; margin-bottom: 15px; background: #1f2937; border: 1px dashed #374151; border-radius: 8px; color: #d1d5db; box-sizing: border-box; }
+        .btn-sidebar { width: 100%; background: var(--primary); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; transition: 0.2s; }
+        .btn-sidebar:hover { background: var(--primary-hover); }
+        .btn-sidebar:disabled { background: #374151; color: #9ca3af; cursor: not-allowed; }
+
+        #uploadStatus { margin-top: 15px; font-size: 13px; line-height: 1.5; padding: 10px; border-radius: 6px; }
+        #uploadStatus.success { background: #064e3b; color: #a7f3d0; }
+        #uploadStatus.error { background: #7f1d1d; color: #fecaca; }
+        #uploadStatus.processing { background: #1e3a8a; color: #bfdbfe; }
+
+        /* Main Chat Area */
+        .chat-container {
+            flex: 1; display: flex; flex-direction: column; background: #ffffff;
+            position: relative;
+        }
+
+        .chat-history {
+            flex: 1; overflow-y: auto; padding: 40px 20px; display: flex; flex-direction: column; gap: 30px;
+            scroll-behavior: smooth;
+        }
+
+        .message {
+            display: flex; gap: 16px; max-width: 850px; margin: 0 auto; width: 100%;
+        }
+
+        .message.user { flex-direction: row-reverse; }
+        
+        .avatar {
+            width: 34px; height: 34px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px; flex-shrink: 0; color: white;
+        }
+        .message.ai .avatar { background: #10b981; }
+        .message.user .avatar { background: #3b82f6; display: none; }
+
+        .message-content {
+            font-size: 15px; line-height: 1.6; max-width: 85%;
+        }
+
+        .message.user .message-content {
+            background: #f3f4f6; color: #111827; padding: 12px 18px; border-radius: 20px; border-bottom-right-radius: 4px;
+        }
+
+        /* AI Message Rich Content Elements */
+        .verdict-box { background: #f0fdf4; border: 1px solid #bbf7d0; padding: 16px; border-radius: 8px; margin-bottom: 16px; color: #166534; font-size: 14.5px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 16px; background: white; }
+        th, td { border: 1px solid #e5e7eb; padding: 10px 14px; text-align: left; }
+        th { background: #f8fafc; font-weight: 600; color: #475569; }
+        .table-responsive { overflow-x: auto; border-radius: 8px; border: 1px solid #e5e7eb; margin-bottom: 16px; }
+        .sql-pre { background: #0f172a; color: #e2e8f0; padding: 12px 16px; border-radius: 8px; font-size: 13px; overflow-x: auto; margin: 0; }
+        .sql-header { font-size: 12px; color: #64748b; margin-bottom: 6px; font-weight: 600; text-transform: uppercase; }
+
+        /* Input Area */
+        .input-area {
+            padding: 20px 40px 30px 40px; background: linear-gradient(0deg, white 60%, rgba(255,255,255,0));
+        }
+
+        .input-area form {
+            max-width: 850px; margin: 0 auto; position: relative; display: flex; gap: 12px; align-items: flex-end;
+            background: white; border: 1px solid #d1d5db; border-radius: 24px; padding: 8px 12px; box-shadow: 0 0 15px rgba(0,0,0,0.05);
+        }
+        .input-area form:focus-within { border-color: #3b82f6; box-shadow: 0 0 20px rgba(59,130,246,0.1); }
+
+        .input-area textarea {
+            flex: 1; min-height: 24px; max-height: 200px; padding: 10px 8px; border: none; resize: none; font-size: 15px; line-height: 1.5; font-family: inherit; background: transparent; outline: none;
+        }
+
+        .input-area button {
+            height: 40px; width: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #10b981; color: white; border: none; cursor: pointer; transition: 0.2s; flex-shrink: 0;
+        }
+        .input-area button:hover { background: #059669; }
+        .input-area button:disabled { background: #d1d5db; cursor: not-allowed; }
+
+        /* Loading Spinner */
+        .loading-badge { display: inline-flex; align-items: center; gap: 10px; background: #eff6ff; padding: 8px 16px; border-radius: 20px; font-size: 13px; color: #1e40af; border: 1px solid #bfdbfe; margin-bottom: 20px; font-weight: 500; }
+        .spinner-small { width: 14px; height: 14px; border: 2px solid #93c5fd; border-top-color: #2563eb; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
     </style>
 </head>
 <body>
-
-    <h1>TRACE</h1>
-    <p class="subtitle">Transaction Risk Analysis & Compliance Engine</p>
-
-    <!-- 1. CSV Upload Section -->
-    <div class="card">
-        <h2>1. Upload Transaction Dataset (CSV)</h2>
-        <form id="uploadForm">
-            <input type="file" name="csvFile" id="csvFile" accept=".csv" required>
-            <button type="submit" id="uploadBtn">Upload and Sync to Supabase</button>
-        </form>
-        <div id="uploadStatus"></div>
-    </div>
-
-    <!-- 2. Chat / Query Section -->
-    <div class="card">
-        <h2>2. Query Data with AI Compliance Agent</h2>
-        <form id="chatForm">
-            <textarea name="message" id="messageInput" placeholder="e.g., Is account ACC-4521 suspicious? Or show all high-value transactions..." required></textarea>
-            <button type="submit" id="chatBtn">Run Agent Analysis</button>
-        </form>
-    </div>
-
-    <!-- Loading Overlay Box -->
-    <div id="loadingBox" class="loading-container">
-        <div class="loading-header">
-            <div class="spinner"></div>
-            <div class="loading-details">
-                <div class="loading-title" id="loadingTitle">Processing...</div>
-                <div class="current-action" id="currentAction">Initiating task...</div>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>TRACE</h2>
+                <p>AI Compliance Engine</p>
             </div>
-            <div class="timer-badge" id="timerBadge">Est. time: ~10s</div>
-        </div>
-        <div class="progress-track">
-            <div class="progress-fill" id="progressFill"></div>
-        </div>
-    </div>
+            
+            <div class="sidebar-section">
+                <h3>1. Dataset Upload</h3>
+                <form id="uploadForm">
+                    <input type="file" name="csvFile" id="csvFile" accept=".csv" required>
+                    <button type="submit" id="uploadBtn" class="btn-sidebar">Upload & Sync</button>
+                </form>
+                <div id="uploadStatus" style="display: none;"></div>
+            </div>
+        </aside>
 
-    <!-- 3. Response / Result Display Section -->
-    <div class="card">
-        <h2>System Response & Audit Log</h2>
-        <pre id="outputLog">Ready for input...</pre>
+        <!-- Main Chat Area -->
+        <main class="chat-container">
+            <div class="chat-history" id="chatHistory">
+                <!-- Welcome Message -->
+                <div class="message ai">
+                    <div class="avatar">AI</div>
+                    <div class="message-content">
+                        <strong>Hello! I am TRACE, your AI Compliance Officer.</strong><br><br>
+                        Please upload your transaction dataset in the sidebar first. Once synced, you can ask me to analyze accounts, find high-risk transactions, or evaluate compliance rules!
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input area -->
+            <div class="input-area">
+                <form id="chatForm">
+                    <textarea name="message" id="messageInput" placeholder="Message TRACE (e.g., Show me transactions by ACC1009...)" required rows="1" oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'"></textarea>
+                    <button type="submit" id="chatBtn">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    </button>
+                </form>
+            </div>
+        </main>
     </div>
 
     <script>
-        class LoadingController {
-            constructor() {
-                this.box = document.getElementById('loadingBox');
-                this.titleEl = document.getElementById('loadingTitle');
-                this.actionEl = document.getElementById('currentAction');
-                this.timerEl = document.getElementById('timerBadge');
-                this.progressEl = document.getElementById('progressFill');
-                this.interval = null;
-                this.startTime = 0;
-                this.estimatedSeconds = 10;
-                this.steps = [];
-            }
-
-            start({ title, estimatedSeconds, steps }) {
-                this.titleEl.textContent = title;
-                this.estimatedSeconds = estimatedSeconds;
-                this.steps = steps || [];
-                this.startTime = Date.now();
-                
-                this.box.classList.add('active');
-                this.updateProgress(5, steps[0]?.text || "Starting...");
-
-                if (this.interval) clearInterval(this.interval);
-
-                this.interval = setInterval(() => {
-                    const elapsed = (Date.now() - this.startTime) / 1000;
-                    const remaining = Math.max(0, Math.ceil(this.estimatedSeconds - elapsed));
-
-                    // Update Timer Display
-                    this.timerEl.textContent = remaining > 0 
-                        ? `⏱ Est. remaining: ~${remaining}s (Elapsed: ${Math.floor(elapsed)}s)`
-                        : `⏱ Finishing up... (${Math.floor(elapsed)}s)`;
-
-                    // Find matching step based on elapsed time
-                    let currentStep = this.steps[0];
-                    for (const step of this.steps) {
-                        if (elapsed >= step.timeAt) {
-                            currentStep = step;
-                        }
-                    }
-
-                    if (currentStep) {
-                        this.actionEl.innerHTML = `<span>⚙️</span> <span>${currentStep.text}</span>`;
-                        const targetProgress = Math.min(95, currentStep.progress);
-                        this.progressEl.style.width = `${targetProgress}%`;
-                    }
-                }, 200);
-            }
-
-            updateProgress(percent, text) {
-                this.progressEl.style.width = `${percent}%`;
-                if (text) {
-                    this.actionEl.innerHTML = `<span>⚙️</span> <span>${text}</span>`;
-                }
-            }
-
-            stop() {
-                if (this.interval) clearInterval(this.interval);
-                this.progressEl.style.width = '100%';
-                setTimeout(() => {
-                    this.box.classList.remove('active');
-                    this.progressEl.style.width = '0%';
-                }, 400);
-            }
+        const chatHistory = document.getElementById('chatHistory');
+        const uploadForm = document.getElementById('uploadForm');
+        const chatForm = document.getElementById('chatForm');
+        
+        function scrollToBottom() {
+            chatHistory.scrollTop = chatHistory.scrollHeight;
         }
 
-        const loader = new LoadingController();
+        function appendUserMessage(text) {
+            const msg = document.createElement('div');
+            msg.className = 'message user';
+            msg.innerHTML = `
+                <div class="avatar">U</div>
+                <div class="message-content">${text.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>
+            `;
+            chatHistory.appendChild(msg);
+            scrollToBottom();
+        }
+
+        function appendAiMessage(htmlContent) {
+            const msg = document.createElement('div');
+            msg.className = 'message ai';
+            msg.innerHTML = `
+                <div class="avatar">AI</div>
+                <div class="message-content" style="width: 100%; max-width: 100%;">${htmlContent}</div>
+            `;
+            chatHistory.appendChild(msg);
+            scrollToBottom();
+            return msg;
+        }
 
         // Handle CSV Upload
-        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+        uploadForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData();
             const fileField = document.getElementById('csvFile');
             const statusEl = document.getElementById('uploadStatus');
-            const outputLog = document.getElementById('outputLog');
             const submitBtn = document.getElementById('uploadBtn');
 
             if (fileField.files.length === 0) return;
             formData.append('csvFile', fileField.files[0]);
 
-            statusEl.innerHTML = "Processing CSV dataset...";
-            statusEl.className = "";
-            outputLog.textContent = "Processing upload request...";
+            statusEl.style.display = 'block';
+            statusEl.textContent = "Processing and analyzing dataset...";
+            statusEl.className = "processing";
             submitBtn.disabled = true;
-
-            // Start Loading Spinner with estimated time & step messages
-            loader.start({
-                title: "Uploading & Analyzing Transaction Dataset",
-                estimatedSeconds: 15,
-                steps: [
-                    { timeAt: 0, progress: 15, text: "Uploading CSV file to server..." },
-                    { timeAt: 2, progress: 35, text: "Parsing CSV rows into structured transactions..." },
-                    { timeAt: 4, progress: 55, text: "Upserting transaction records to Supabase database..." },
-                    { timeAt: 7, progress: 75, text: "Running LangGraph AML compliance investigation graph..." },
-                    { timeAt: 12, progress: 92, text: "Generating risk score reports and saving audit logs..." }
-                ]
-            });
 
             try {
                 const response = await fetch('/api/upload', {
@@ -275,49 +217,44 @@
                 });
                 const result = await response.json();
                 
-                loader.stop();
-
                 if (response.ok) {
-                    statusEl.innerHTML = `✓ ${result.message}`;
+                    statusEl.textContent = \`✓ \${result.message}\`;
                     statusEl.className = "success";
-                    outputLog.textContent = JSON.stringify(result, null, 2);
+                    appendAiMessage(\`<strong>Dataset Uploaded Successfully</strong><br>Parsed and synced \${result.totalInserted} records. I am ready to answer your questions!\`);
                 } else {
-                    statusEl.innerHTML = `✗ Error: ${result.error || 'Upload failed'}`;
+                    statusEl.textContent = \`✗ Error: \${result.error || 'Upload failed'}\`;
                     statusEl.className = "error";
-                    outputLog.textContent = JSON.stringify(result, null, 2);
                 }
             } catch (err) {
-                loader.stop();
-                statusEl.innerHTML = `✗ Network error during upload.`;
+                statusEl.textContent = \`✗ Network error during upload.\`;
                 statusEl.className = "error";
-                outputLog.textContent = err.message;
             } finally {
                 submitBtn.disabled = false;
             }
         });
 
         // Handle Chat Query
-        document.getElementById('chatForm').addEventListener('submit', async (e) => {
+        chatForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const message = document.getElementById('messageInput').value;
-            const outputLog = document.getElementById('outputLog');
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value.trim();
             const submitBtn = document.getElementById('chatBtn');
 
-            outputLog.textContent = "Querying dataset and evaluating compliance risk...";
+            if (!message) return;
+
+            // Add user message to UI
+            appendUserMessage(message);
+            messageInput.value = '';
+            messageInput.style.height = '';
             submitBtn.disabled = true;
 
-            // Start Loading Spinner with estimated time & step messages
-            loader.start({
-                title: "Running AI Compliance Agent Analysis",
-                estimatedSeconds: 8,
-                steps: [
-                    { timeAt: 0, progress: 20, text: "Connecting to DuckDB query engine..." },
-                    { timeAt: 1.5, progress: 45, text: "Translating natural language to DuckDB SQL via Groq (Llama-3.3-70b)..." },
-                    { timeAt: 3.5, progress: 70, text: "Executing SQL query on transaction dataset..." },
-                    { timeAt: 5.5, progress: 88, text: "Evaluating retrieved financial records for AML risk patterns..." },
-                    { timeAt: 7, progress: 95, text: "Formatting compliance officer verdict..." }
-                ]
-            });
+            // Show Loading Indicator in Chat
+            const loader = appendAiMessage(\`
+                <div class="loading-badge" id="activeLoader">
+                    <div class="spinner-small"></div>
+                    Evaluating AML patterns...
+                </div>
+            \`);
 
             try {
                 const response = await fetch('/api/chat', {
@@ -327,17 +264,63 @@
                 });
                 const result = await response.json();
 
-                loader.stop();
-                outputLog.textContent = JSON.stringify(result, null, 2);
+                // Remove loader
+                loader.remove();
+
+                if (result.success && result.results) {
+                    let aiHtml = '';
+
+                    // Verdict
+                    if (result.complianceVerdict) {
+                        aiHtml += \`<div class="verdict-box">\${result.complianceVerdict.replace(/\\n/g, '<br>')}</div>\`;
+                    }
+
+                    // Results Table
+                    if (Array.isArray(result.results) && result.results.length > 0) {
+                        const headers = Object.keys(result.results[0]);
+                        const thead = \`<tr>\${headers.map(h => \`<th>\${h}</th>\`).join('')}</tr>\`;
+                        const tbody = result.results.map(row => 
+                            \`<tr>\${headers.map(h => \`<td>\${row[h] !== null ? row[h] : ''}</td>\`).join('')}</tr>\`
+                        ).join('');
+                        
+                        aiHtml += \`
+                        <div class="table-responsive">
+                            <table>
+                                <thead>\${thead}</thead>
+                                <tbody>\${tbody}</tbody>
+                            </table>
+                        </div>\`;
+                    } else if (Array.isArray(result.results)) {
+                        aiHtml += \`<div style="margin-bottom: 16px; color: #64748b;">No matching records found.</div>\`;
+                    }
+
+                    // SQL Snippet
+                    if (result.sql) {
+                        aiHtml += \`
+                        <div class="sql-header">Generated DuckDB SQL</div>
+                        <pre class="sql-pre">\${result.sql}</pre>\`;
+                    }
+
+                    appendAiMessage(aiHtml);
+                } else {
+                    appendAiMessage(\`<div style="color: #dc2626; font-weight: 500;">Error:</div><pre class="sql-pre">\${JSON.stringify(result, null, 2)}</pre>\`);
+                }
             } catch (err) {
-                loader.stop();
-                outputLog.textContent = "Error processing chat request.";
-                console.error(err);
+                loader.remove();
+                appendAiMessage(\`<div style="color: #dc2626; font-weight: 500;">Network Error processing chat request.</div>\`);
             } finally {
                 submitBtn.disabled = false;
+                messageInput.focus();
+            }
+        });
+
+        // Submit on Enter (Shift+Enter for newline)
+        document.getElementById('messageInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                chatForm.dispatchEvent(new Event('submit'));
             }
         });
     </script>
-
 </body>
-</html>
+</html>

@@ -11,6 +11,12 @@ import { graph } from "./agents/graph.js";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import duckdb from "duckdb";
 
+// DuckDB returns BigInts for some fields, which natively causes JSON.stringify to throw an error.
+// This adds a `toJSON` method to all BigInts to safely convert them to strings during JSON serialization.
+BigInt.prototype.toJSON = function () {
+    return this.toString();
+};
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 const uploadDir = path.join(process.cwd(), "data");
@@ -163,8 +169,19 @@ const refreshDuckView = async () => {
 
     const escapedPath = activeDatasetDuckPath.replace(/'/g, "''");
 
+    const { data: reports } = await supabase.from('compliance_reports').select('*');
+    if (reports) {
+        const reportsPath = path.join(uploadDir, "compliance_reports.json");
+        fs.writeFileSync(reportsPath, JSON.stringify(reports));
+        const escapedReportsPath = reportsPath.replace(/\\/g, "/").replace(/'/g, "''");
+        await runDuckStatement(`
+            CREATE OR REPLACE TEMP VIEW compliance_reports AS
+            SELECT * FROM read_json_auto('${escapedReportsPath}')
+        `);
+    }
+
     await runDuckStatement(`
-        CREATE OR REPLACE TEMP VIEW active_transactions AS
+        CREATE OR REPLACE TEMP VIEW transactions AS
         SELECT * FROM read_csv_auto('${escapedPath}', HEADER = TRUE)
     `);
 };
@@ -244,10 +261,21 @@ app.post("/api/chat", async (req, res) => {
 
         await refreshDuckView();
 
+        const sampleRowsTx = await runDuckQuery("SELECT * FROM transactions LIMIT 1");
+        const txColumns = sampleRowsTx.length > 0 ? Object.keys(sampleRowsTx[0]).join(", ") : "";
+
+        let reportsColumns = "";
+        try {
+            const sampleRowsRep = await runDuckQuery("SELECT * FROM compliance_reports LIMIT 1");
+            reportsColumns = sampleRowsRep.length > 0 ? Object.keys(sampleRowsRep[0]).join(", ") : "";
+        } catch (e) {}
+
         const sqlSystemPrompt = `You are an expert Text-to-SQL engine for DuckDB.
-The uploaded dataset is available as a DuckDB view named active_transactions.
-The view contains these columns: ${transactionColumns.join(", ")}.
+The database has two tables:
+1. transactions: ${txColumns}
+2. compliance_reports: ${reportsColumns}
 Write a valid DuckDB SQL query that answers the user's request.
+IMPORTANT: Always select key identifying columns (like account_id, transaction_id, customer_name) so the context is clear. Prefer SELECT * unless specifically asked to aggregate.
 Return ONLY the raw SQL query string with no markdown and no extra text.`;
 
         const sqlAiResponse = await model.invoke([
@@ -275,10 +303,11 @@ Return ONLY the raw SQL query string with no markdown and no extra text.`;
 
         const analysisSystemPrompt = `You are TRACE, an expert Anti-Money Laundering (AML) compliance officer.
 User Question: "${message}"
-Retrieved Data:
+Retrieved Data (Result of the database query for the user's question):
 ${JSON.stringify(queryResults, null, 2)}
 
 Analyze these records for suspicious patterns and provide a professional compliance verdict.
+Note: The retrieved data directly corresponds to the User Question, even if certain identifying columns (like account_id) were omitted from the SQL SELECT clause.
 Do not invent facts that are not present in the retrieved data.`;
 
         const analysisAiResponse = await model.invoke([

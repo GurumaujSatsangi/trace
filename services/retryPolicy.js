@@ -45,10 +45,21 @@ export async function executeWithRetry({
     let apiCalls = 0;
     let retries = 0;
 
+    // Default timeout of 15000ms if not specified
+    const timeoutMs = 15000;
+
     for (let attempt = 0; attempt <= maxRetries; attempt += 1) {
         apiCalls += 1;
         try {
-            const data = await fn();
+            const timeoutPromise = new Promise((_, reject) =>
+                setTimeout(() => {
+                    const err = new Error(`Timeout of ${timeoutMs}ms exceeded`);
+                    err.code = "ETIMEDOUT";
+                    reject(err);
+                }, timeoutMs)
+            );
+            const data = await Promise.race([fn(), timeoutPromise]);
+            
             return {
                 success: true,
                 data,

@@ -52,8 +52,8 @@ export async function openSanctionsAgent(state) {
             const fallback = { matched: false, pep: false, score: 0, matches: [], unavailable: true };
             const res = await executeWithRetry({
                 fn: () => checkOpenSanctions(tx.customer_name),
-                maxRetries: 3,
-                backoff: [2000, 4000, 8000],
+                maxRetries: 2,
+                backoff: [500, 1000],
                 isRetryable: isTimeoutError,
                 fallbackValue: fallback,
                 apiName: "OpenSanctions"
@@ -98,8 +98,8 @@ export async function ipIntelAgent(state) {
             const fallback = { vpn: false, proxy: false, country: null, isp: null, unavailable: true };
             const res = await executeWithRetry({
                 fn: () => checkIPAddress(tx.ip_address || ""),
-                maxRetries: 3,
-                backoff: [2000, 4000, 8000],
+                maxRetries: 2,
+                backoff: [500, 1000],
                 isRetryable: isTimeoutError,
                 fallbackValue: fallback,
                 apiName: "IP Intelligence"
@@ -145,8 +145,8 @@ export async function exchangeRateAgent(state) {
         currencies.map(async (curr) => {
             const res = await executeWithRetry({
                 fn: () => exchangeRate(curr, "USD"),
-                maxRetries: 3,
-                backoff: [2000, 4000, 8000],
+                maxRetries: 2,
+                backoff: [500, 1000],
                 isRetryable: isTimeoutError,
                 fallbackValue: 1,
                 apiName: "Exchange Rate API"

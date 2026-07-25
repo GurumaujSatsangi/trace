@@ -139,6 +139,7 @@ export function evaluateAMLRules(tx) {
     // -----------------------------
     // Confidence Score
     // -----------------------------
+    riskScore = Math.min(100, riskScore);
     const confidenceScore = Math.min(
         100,
         Math.round(
