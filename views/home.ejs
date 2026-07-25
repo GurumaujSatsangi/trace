@@ -5,18 +5,123 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TRACE - Compliance Engine</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 850px; margin: 40px auto; padding: 0 20px; background: #f8f9fa; color: #333; }
-        .card { background: white; padding: 24px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; }
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text: #333333;
+            --text-muted: #64748b;
+            --border: #e5e7eb;
+            --success: #16a34a;
+            --error: #dc2626;
+        }
+
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 850px; margin: 40px auto; padding: 0 20px; background: var(--bg); color: var(--text); }
+        .card { background: var(--card-bg); padding: 24px; margin-bottom: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid var(--border); }
         h1 { color: #1e293b; margin-bottom: 5px; }
         h2 { margin-top: 0; color: #0f172a; font-size: 1.25rem; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; }
-        input[type="file"], textarea { width: 100%; padding: 12px; margin: 12px 0; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 14px; }
+        input[type="file"], textarea { width: 100%; padding: 12px; margin: 12px 0; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; font-size: 14px; }
         textarea { height: 90px; resize: vertical; }
-        button { background: #2563eb; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; transition: background 0.2s; }
-        button:hover { background: #1d4ed8; }
-        pre { background: #0f172a; color: #e2e8f0; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
-        .success { color: #16a34a; font-weight: 600; margin-top: 8px; }
-        .error { color: #dc2626; font-weight: 600; margin-top: 8px; }
-        .subtitle { color: #64748b; margin-bottom: 24px; }
+        button { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; transition: background 0.2s, transform 0.1s; }
+        button:hover { background: var(--primary-hover); }
+        button:disabled { background: #94a3b8; cursor: not-allowed; }
+        pre { background: #0f172a; color: #e2e8f0; padding: 16px; border-radius: 8px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+        .success { color: var(--success); font-weight: 600; margin-top: 8px; }
+        .error { color: var(--error); font-weight: 600; margin-top: 8px; }
+        .subtitle { color: var(--text-muted); margin-bottom: 24px; }
+
+        /* Loading Spinner & Progress Components */
+        .loading-container {
+            display: none;
+            background: #f0f7ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 16px 0;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .loading-container.active {
+            display: block;
+        }
+
+        .loading-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 14px;
+        }
+
+        /* Dual-ring Animated Spinner */
+        .spinner {
+            width: 36px;
+            height: 36px;
+            min-width: 36px;
+            border: 4px solid #dbeafe;
+            border-top: 4px solid var(--primary);
+            border-right: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .loading-details {
+            flex-grow: 1;
+        }
+
+        .loading-title {
+            font-weight: 600;
+            color: #1e3a8a;
+            font-size: 15px;
+            margin-bottom: 4px;
+        }
+
+        .current-action {
+            font-size: 13.5px;
+            color: #2563eb;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .timer-badge {
+            font-size: 12.5px;
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 4px 10px;
+            border-radius: 16px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        /* Progress Bar */
+        .progress-track {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #2563eb, #3b82f6);
+            border-radius: 4px;
+            transition: width 0.4s ease;
+        }
     </style>
 </head>
 <body>
@@ -29,7 +134,7 @@
         <h2>1. Upload Transaction Dataset (CSV)</h2>
         <form id="uploadForm">
             <input type="file" name="csvFile" id="csvFile" accept=".csv" required>
-            <button type="submit">Upload and Sync to Supabase</button>
+            <button type="submit" id="uploadBtn">Upload and Sync to Supabase</button>
         </form>
         <div id="uploadStatus"></div>
     </div>
@@ -39,8 +144,23 @@
         <h2>2. Query Data with AI Compliance Agent</h2>
         <form id="chatForm">
             <textarea name="message" id="messageInput" placeholder="e.g., Is account ACC-4521 suspicious? Or show all high-value transactions..." required></textarea>
-            <button type="submit">Run Agent Analysis</button>
+            <button type="submit" id="chatBtn">Run Agent Analysis</button>
         </form>
+    </div>
+
+    <!-- Loading Overlay Box -->
+    <div id="loadingBox" class="loading-container">
+        <div class="loading-header">
+            <div class="spinner"></div>
+            <div class="loading-details">
+                <div class="loading-title" id="loadingTitle">Processing...</div>
+                <div class="current-action" id="currentAction">Initiating task...</div>
+            </div>
+            <div class="timer-badge" id="timerBadge">Est. time: ~10s</div>
+        </div>
+        <div class="progress-track">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
     </div>
 
     <!-- 3. Response / Result Display Section -->
@@ -50,6 +170,74 @@
     </div>
 
     <script>
+        class LoadingController {
+            constructor() {
+                this.box = document.getElementById('loadingBox');
+                this.titleEl = document.getElementById('loadingTitle');
+                this.actionEl = document.getElementById('currentAction');
+                this.timerEl = document.getElementById('timerBadge');
+                this.progressEl = document.getElementById('progressFill');
+                this.interval = null;
+                this.startTime = 0;
+                this.estimatedSeconds = 10;
+                this.steps = [];
+            }
+
+            start({ title, estimatedSeconds, steps }) {
+                this.titleEl.textContent = title;
+                this.estimatedSeconds = estimatedSeconds;
+                this.steps = steps || [];
+                this.startTime = Date.now();
+                
+                this.box.classList.add('active');
+                this.updateProgress(5, steps[0]?.text || "Starting...");
+
+                if (this.interval) clearInterval(this.interval);
+
+                this.interval = setInterval(() => {
+                    const elapsed = (Date.now() - this.startTime) / 1000;
+                    const remaining = Math.max(0, Math.ceil(this.estimatedSeconds - elapsed));
+
+                    // Update Timer Display
+                    this.timerEl.textContent = remaining > 0 
+                        ? `⏱ Est. remaining: ~${remaining}s (Elapsed: ${Math.floor(elapsed)}s)`
+                        : `⏱ Finishing up... (${Math.floor(elapsed)}s)`;
+
+                    // Find matching step based on elapsed time
+                    let currentStep = this.steps[0];
+                    for (const step of this.steps) {
+                        if (elapsed >= step.timeAt) {
+                            currentStep = step;
+                        }
+                    }
+
+                    if (currentStep) {
+                        this.actionEl.innerHTML = `<span>⚙️</span> <span>${currentStep.text}</span>`;
+                        const targetProgress = Math.min(95, currentStep.progress);
+                        this.progressEl.style.width = `${targetProgress}%`;
+                    }
+                }, 200);
+            }
+
+            updateProgress(percent, text) {
+                this.progressEl.style.width = `${percent}%`;
+                if (text) {
+                    this.actionEl.innerHTML = `<span>⚙️</span> <span>${text}</span>`;
+                }
+            }
+
+            stop() {
+                if (this.interval) clearInterval(this.interval);
+                this.progressEl.style.width = '100%';
+                setTimeout(() => {
+                    this.box.classList.remove('active');
+                    this.progressEl.style.width = '0%';
+                }, 400);
+            }
+        }
+
+        const loader = new LoadingController();
+
         // Handle CSV Upload
         document.getElementById('uploadForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -57,13 +245,28 @@
             const fileField = document.getElementById('csvFile');
             const statusEl = document.getElementById('uploadStatus');
             const outputLog = document.getElementById('outputLog');
+            const submitBtn = document.getElementById('uploadBtn');
 
             if (fileField.files.length === 0) return;
             formData.append('csvFile', fileField.files[0]);
 
-            statusEl.innerHTML = "Uploading and parsing records into Supabase...";
+            statusEl.innerHTML = "Processing CSV dataset...";
             statusEl.className = "";
             outputLog.textContent = "Processing upload request...";
+            submitBtn.disabled = true;
+
+            // Start Loading Spinner with estimated time & step messages
+            loader.start({
+                title: "Uploading & Analyzing Transaction Dataset",
+                estimatedSeconds: 15,
+                steps: [
+                    { timeAt: 0, progress: 15, text: "Uploading CSV file to server..." },
+                    { timeAt: 2, progress: 35, text: "Parsing CSV rows into structured transactions..." },
+                    { timeAt: 4, progress: 55, text: "Upserting transaction records to Supabase database..." },
+                    { timeAt: 7, progress: 75, text: "Running LangGraph AML compliance investigation graph..." },
+                    { timeAt: 12, progress: 92, text: "Generating risk score reports and saving audit logs..." }
+                ]
+            });
 
             try {
                 const response = await fetch('/api/upload', {
@@ -72,6 +275,8 @@
                 });
                 const result = await response.json();
                 
+                loader.stop();
+
                 if (response.ok) {
                     statusEl.innerHTML = `✓ ${result.message}`;
                     statusEl.className = "success";
@@ -82,9 +287,12 @@
                     outputLog.textContent = JSON.stringify(result, null, 2);
                 }
             } catch (err) {
+                loader.stop();
                 statusEl.innerHTML = `✗ Network error during upload.`;
                 statusEl.className = "error";
                 outputLog.textContent = err.message;
+            } finally {
+                submitBtn.disabled = false;
             }
         });
 
@@ -93,8 +301,23 @@
             e.preventDefault();
             const message = document.getElementById('messageInput').value;
             const outputLog = document.getElementById('outputLog');
+            const submitBtn = document.getElementById('chatBtn');
 
-            outputLog.textContent = "Querying Supabase via Groq Text-to-SQL and running AML analysis...";
+            outputLog.textContent = "Querying dataset and evaluating compliance risk...";
+            submitBtn.disabled = true;
+
+            // Start Loading Spinner with estimated time & step messages
+            loader.start({
+                title: "Running AI Compliance Agent Analysis",
+                estimatedSeconds: 8,
+                steps: [
+                    { timeAt: 0, progress: 20, text: "Connecting to DuckDB query engine..." },
+                    { timeAt: 1.5, progress: 45, text: "Translating natural language to DuckDB SQL via Groq (Llama-3.3-70b)..." },
+                    { timeAt: 3.5, progress: 70, text: "Executing SQL query on transaction dataset..." },
+                    { timeAt: 5.5, progress: 88, text: "Evaluating retrieved financial records for AML risk patterns..." },
+                    { timeAt: 7, progress: 95, text: "Formatting compliance officer verdict..." }
+                ]
+            });
 
             try {
                 const response = await fetch('/api/chat', {
@@ -104,13 +327,17 @@
                 });
                 const result = await response.json();
 
+                loader.stop();
                 outputLog.textContent = JSON.stringify(result, null, 2);
             } catch (err) {
+                loader.stop();
                 outputLog.textContent = "Error processing chat request.";
                 console.error(err);
+            } finally {
+                submitBtn.disabled = false;
             }
         });
     </script>
 
 </body>
-</html>
+</html>

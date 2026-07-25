@@ -179,6 +179,7 @@ app.post("/api/upload", upload.single("csvFile"), async (req, res) => {
     }
 
     try {
+        console.log("CSV Uploaded");
         const results = await parseCsvFile(req.file.path);
 
         if (results.length === 0) {
@@ -192,6 +193,8 @@ app.post("/api/upload", upload.single("csvFile"), async (req, res) => {
         if (upsertError) {
             throw upsertError;
         }
+
+        console.log("Transactions Inserted");
 
         const uploadedIds = results.map((row) => row.transaction_id);
 
@@ -211,6 +214,7 @@ app.post("/api/upload", upload.single("csvFile"), async (req, res) => {
         const graphResult = await graph.invoke({
             transactions: uploadedTransactions,
             query_prompt: "CSV Upload Analysis",
+            sql_generated: null,
             startedAt: new Date().toISOString()
         });
 

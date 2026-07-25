@@ -1,107 +1,180 @@
 import { ChatGroq } from "@langchain/groq";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import "dotenv/config";
+import { executeWithRetry, isGroqRetryableError } from "../services/retryPolicy.js";
 
-const model = new ChatGroq({
+const primaryModel = new ChatGroq({
     apiKey: process.env.API_KEY,
     model: "llama-3.3-70b-versatile",
     temperature: 0
 });
 
-export async function investigationAgent(state) {
+const fallbackModel = new ChatGroq({
+    apiKey: process.env.API_KEY,
+    model: "llama-3.1-8b-instant",
+    temperature: 0
+});
 
-    console.log("Generating AI Investigation Reports...");
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-    const reports = Array.isArray(state.reports) ? state.reports : [];
+const buildInvestigationInput = (report) => {
+    const transaction = report.transaction || {};
+    const qa = report.qa || {};
+    const enrichment = report.enrichment || {};
 
-    const investigatedReports = await Promise.all(
+    return {
+        transaction_id: transaction.transaction_id || qa.transaction_id || null,
+        customer_name: transaction.customer_name || null,
+        amount: transaction.amount ?? null,
+        currency: transaction.currency || null,
+        country: qa.transaction_country || transaction.country || transaction.location || null,
+        destination_country: transaction.destination_country || null,
+        risk_score: qa.risk_score ?? null,
+        confidence_score: qa.confidence_score ?? null,
+        risk_level: qa.risk_level || null,
+        flags: qa.flags || [],
+        sanctions: enrichment.sanctions || null,
+        pep: enrichment.pep ?? enrichment.sanctions?.pep ?? false,
+        vpn: enrichment.ipIntel?.vpn ?? false,
+        proxy: enrichment.ipIntel?.proxy ?? false,
+        adverse_media: {
+            matched: qa.adverse_media_match ?? false,
+            links: Array.isArray(qa.adverse_media_links) ? qa.adverse_media_links : []
+        }
+    };
+};
 
-        reports.map(async (report) => {
+const createFallbackReport = (report) => ({
+    ...report,
+    investigation: {
+        compliance_verdict:
+            "Manual compliance review recommended. Investigation model could not be completed due to a transient provider limit.",
+        fallback: true
+    }
+});
 
-            try {
-
-                // Skip LLM for LOW risk transactions
-                if ((report.risk_level || "LOW") === "LOW") {
-
-                    return {
-                        ...report,
-                        compliance_verdict:
-                            "Transaction classified as LOW RISK. No significant AML indicators were detected. Continue routine monitoring."
-                    };
-
-                }
-
-                const prompt = `
+const formatInvestigationPrompt = (input) => `
 You are TRACE, a Senior Anti-Money Laundering (AML) Compliance Officer.
 
-Analyze the following transaction.
+Analyze the transaction below.
 
-Transaction Details:
-${JSON.stringify(report, null, 2)}
+Transaction:
+${JSON.stringify(input, null, 2)}
 
-Generate a professional investigation report using exactly these headings:
-
+Return a concise professional AML investigation report with exactly these headings:
 1. Executive Summary
 2. Suspicious Indicators
 3. Risk Assessment
 4. Recommended Action
 
-Requirements:
-- Explain WHY the transaction was flagged.
-- Mention sanctions, PEP, VPN, proxy, adverse media, jurisdiction, and AML rules ONLY if present.
-- Mention confidence score.
-- Mention risk score.
-- Mention risk level.
-- Recommend an appropriate compliance action.
-- Maximum 250 words.
-- Do NOT invent facts.
-- Base your answer ONLY on the supplied transaction data.
+Use only the supplied data. Do not invent facts.
+Maximum 250 words.
 `;
 
-                const response = await model.invoke([
-                    new SystemMessage(prompt),
-                    new HumanMessage("Generate Investigation Report")
-                ]);
+export async function investigationAgent(state) {
 
-                return {
+    if (process.env.DEBUG === "true") {
+        console.log("Generating AI Investigation Reports...");
+    }
 
-                    ...report,
+    const reports = Array.isArray(state.reports) ? state.reports : [];
+    const investigatedReports = [...reports];
 
-                    compliance_verdict: response.content
+    // Filter reports requiring investigation (MEDIUM or HIGH risk score >= 40)
+    const highRiskQueue = reports
+        .map((report, index) => ({ report, index }))
+        .filter(({ report }) => Number(report.qa?.risk_score ?? 0) >= 40);
 
-                };
+    let totalApiCalls = 0;
+    let totalRetries = 0;
+    const failedApisList = [];
 
+    // Worker pool for maximum 2 concurrent Groq requests
+    const concurrencyLimit = 2;
+    let cursor = 0;
+
+    const workers = Array.from({ length: Math.min(concurrencyLimit, highRiskQueue.length) }, async () => {
+        while (cursor < highRiskQueue.length) {
+            const currentIndex = cursor;
+            cursor += 1;
+            const { report, index } = highRiskQueue[currentIndex];
+            const investigationInput = buildInvestigationInput(report);
+            const prompt = formatInvestigationPrompt(investigationInput);
+
+            const messages = [
+                new SystemMessage(prompt),
+                new HumanMessage("Generate Investigation Report")
+            ];
+
+            // 1. Try primary model (llama-3.3-70b-versatile) with 1 fast retry
+            let res = await executeWithRetry({
+                fn: () => primaryModel.invoke(messages),
+                maxRetries: 1,
+                backoff: [1000],
+                isRetryable: isGroqRetryableError,
+                fallbackValue: null,
+                apiName: "Groq Primary (llama-3.3-70b-versatile)"
+            });
+
+            totalApiCalls += res.apiCalls;
+            totalRetries += res.retries;
+
+            // 2. If primary model fails / rate limits, try fallback model (llama-3.1-8b-instant)
+            if (!res.success || !res.data?.content) {
+                const fallbackRes = await executeWithRetry({
+                    fn: () => fallbackModel.invoke(messages),
+                    maxRetries: 1,
+                    backoff: [1000],
+                    isRetryable: isGroqRetryableError,
+                    fallbackValue: null,
+                    apiName: "Groq Fallback (llama-3.1-8b-instant)"
+                });
+
+                totalApiCalls += fallbackRes.apiCalls;
+                totalRetries += fallbackRes.retries;
+                if (fallbackRes.success && fallbackRes.data?.content) {
+                    res = fallbackRes;
+                }
             }
 
-            catch (err) {
-
-                console.error(
-                    `Investigation failed for Transaction ${report.transaction_id}:`,
-                    err.message
-                );
-
-                return {
-
+            if (res.success && res.data?.content) {
+                investigatedReports[index] = {
                     ...report,
-
-                    compliance_verdict:
-                        "Unable to generate AI investigation report. Manual compliance review is recommended."
-
+                    investigation: {
+                        compliance_verdict: res.data.content,
+                        model: "Groq"
+                    }
                 };
-
+            } else {
+                failedApisList.push("Groq");
+                investigatedReports[index] = {
+                    ...report,
+                    investigation: {
+                        compliance_verdict: `1. Executive Summary\nAutomated compliance report for ${investigationInput.customer_name || 'Account'} (${investigationInput.transaction_id || 'N/A'}).\n\n2. Suspicious Indicators\nFlagged risk factors: ${(investigationInput.flags || []).join(", ") || "Elevated risk score"}. Transaction Amount: ${investigationInput.amount ?? 0} ${investigationInput.currency || 'USD'}.\n\n3. Risk Assessment\nCalculated Risk Score: ${investigationInput.risk_score ?? 'N/A'}/100 (${investigationInput.risk_level || 'HIGH'} RISK).\n\n4. Recommended Action\nManual compliance officer review recommended (Provider LLM rate limit fallback).`,
+                        fallback: true
+                    }
+                };
             }
 
-        })
+            // Small spacing delay between worker executions to smooth out burst requests
+            await sleep(600);
+        }
+    });
 
-    );
+    await Promise.all(workers);
 
-    console.log("Investigation Complete.");
+    console.log("Investigation Complete");
 
     return {
 
-        ...state,
+        reports: investigatedReports,
 
-        reports: investigatedReports
+        graphMetrics: {
+            nodesExecuted: ["investigationNode"],
+            apiCalls: totalApiCalls,
+            retries: totalRetries,
+            failedApis: Array.from(new Set(failedApisList))
+        }
 
     };
 

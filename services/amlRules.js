@@ -8,19 +8,28 @@ export function evaluateAMLRules(tx) {
     const ipIntel = enrichment.ipIntel || {};
     const adverseMedia = enrichment.adverseMedia || {};
     const amount = Number(tx.amount || 0);
-    const usdAmount = Number(enrichment.usdAmount || amount);
-    const sourceCountry = String(tx.country || "").trim().toLowerCase();
+    const usdAmount = Number(enrichment.usdAmount ?? amount);
+    const sourceCountry = String(enrichment.transaction_country || tx.country || "").trim().toLowerCase();
     const destinationCountry = String(tx.destination_country || "").trim().toLowerCase();
+    const beneficiaryName = String(tx.beneficiary_name || "").trim().toLowerCase();
+    const senderName = String(tx.sender_name || tx.customer_name || "").trim().toLowerCase();
     const highRiskJurisdictions = ["iran", "north korea", "myanmar", "syria", "afghanistan"];
+    const structuringDetected = amount >= 9000 && amount < 10000 && /cash|deposit/i.test(String(tx.transaction_type || ""));
+    const layeringDetected = /transfer|wire|swift|corporate/i.test(String(tx.transaction_type || "")) && destinationCountry && destinationCountry !== sourceCountry && !/self/i.test(beneficiaryName);
+    const highVelocityDetected = Number(enrichment.account_transaction_count || 0) >= 3;
+    const highRiskJurisdiction = highRiskJurisdictions.includes(sourceCountry) || highRiskJurisdictions.includes(destinationCountry);
+    const behavioralAnomaly = Boolean((ipIntel.vpn || ipIntel.proxy) && /online|internet|mobile/i.test(String(tx.channel || "")));
+    const uboRisk = Boolean(
+        layeringDetected ||
+        (beneficiaryName && senderName && beneficiaryName !== senderName && /corporate|transfer|wire/i.test(String(tx.transaction_type || "")))
+    );
+    const sanctionsSource = sanctions.source || "OpenSanctions";
+    const pepSource = sanctions.pepSource ?? (sanctions.pep ? sanctionsSource : null);
 
     // -----------------------------
     // Rule 1 : Structuring
     // -----------------------------
-    if (
-        amount >= 9000 &&
-        amount < 10000 &&
-        /cash|deposit/i.test(String(tx.transaction_type || ""))
-    ) {
+    if (structuringDetected) {
 
         flags.push("Possible Structuring");
 
@@ -75,10 +84,7 @@ export function evaluateAMLRules(tx) {
     // -----------------------------
     // Rule 6 : High Risk Country
     // -----------------------------
-    if (
-        highRiskJurisdictions.includes(sourceCountry) ||
-        highRiskJurisdictions.includes(destinationCountry)
-    ) {
+    if (highRiskJurisdiction) {
 
         flags.push("High Risk Jurisdiction");
 
@@ -89,7 +95,7 @@ export function evaluateAMLRules(tx) {
     // -----------------------------
     // Rule 7 : Adverse Media
     // -----------------------------
-    if (adverseMedia.matched || (Array.isArray(adverseMedia.articles) && adverseMedia.articles.length > 0)) {
+    if (adverseMedia.matched || (Array.isArray(adverseMedia.links) && adverseMedia.links.length > 0) || (Array.isArray(adverseMedia.articles) && adverseMedia.articles.length > 0)) {
 
         flags.push("Adverse Media");
 
@@ -100,12 +106,7 @@ export function evaluateAMLRules(tx) {
     // -----------------------------
     // Rule 8 : Layering
     // -----------------------------
-    if (
-        /transfer|wire|swift|corporate/i.test(String(tx.transaction_type || "")) &&
-        destinationCountry &&
-        destinationCountry !== sourceCountry &&
-        !/self/i.test(String(tx.beneficiary_name || ""))
-    ) {
+    if (layeringDetected) {
 
         flags.push("Possible Layering");
 
@@ -116,10 +117,7 @@ export function evaluateAMLRules(tx) {
     // -----------------------------
     // Rule 9 : Behavioral Anomaly
     // -----------------------------
-    if (
-        (ipIntel.vpn || ipIntel.proxy) &&
-        /online|internet|mobile/i.test(String(tx.channel || ""))
-    ) {
+    if (behavioralAnomaly) {
 
         flags.push("Behavioral Anomaly");
 
@@ -128,7 +126,7 @@ export function evaluateAMLRules(tx) {
     }
 
     // -----------------------------
-    // Rule 8 : Large Transaction
+    // Rule 10 : Large Transaction
     // -----------------------------
     if (usdAmount > 100000) {
 
@@ -166,6 +164,22 @@ export function evaluateAMLRules(tx) {
         confidence_score: confidenceScore,
 
         risk_level: riskLevel,
+
+        structuringDetected,
+
+        layeringDetected,
+
+        highVelocityDetected,
+
+        highRiskJurisdiction,
+
+        behavioralAnomaly,
+
+        uboRisk,
+
+        sanctionsSource,
+
+        pepSource,
 
         flags
 

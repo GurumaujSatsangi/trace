@@ -2,91 +2,160 @@ import { evaluateAMLRules } from "../services/amlRules.js";
 
 export async function qualityAssuranceAgent(state) {
 
-    console.log("Running AML Rule Engine...");
+    if (process.env.DEBUG === "true") {
+        console.log("Running AML Rule Engine...");
+    }
 
     const enrichedTransactions = Array.isArray(state.enrichedTransactions)
         ? state.enrichedTransactions
         : [];
 
     const ruleResults = [];
+    const queryPrompt = state.query_prompt || "CSV Upload Analysis";
+    const sqlGenerated = state.sql_generated ?? null;
+
+    let lowCount = 0;
+    let mediumCount = 0;
+    let highCount = 0;
 
     const reports = enrichedTransactions.map((tx) => {
 
-        const result = evaluateAMLRules(tx);
+        const transaction = tx.transaction || {};
+        const enrichment = tx.enrichment || {};
+        const ruleInput = {
+            amount: transaction.amount,
+            transaction_type: transaction.transaction_type,
+            country: transaction.country,
+            destination_country: transaction.destination_country,
+            beneficiary_name: transaction.beneficiary_name,
+            sender_name: transaction.sender_name,
+            channel: transaction.channel,
+            enrichment
+        };
+        const result = evaluateAMLRules(ruleInput);
+
+        const riskLevel = result.risk_level || "LOW";
+        if (riskLevel === "HIGH") {
+            highCount += 1;
+        } else if (riskLevel === "MEDIUM") {
+            mediumCount += 1;
+        } else {
+            lowCount += 1;
+        }
 
         ruleResults.push({
-
-            transaction_id: tx.transaction_id,
-
-            account_id: tx.account_id,
-
+            transaction_id: transaction.transaction_id,
+            account_id: transaction.account_id,
             risk_score: result.risk_score,
-
             confidence_score: result.confidence_score,
-
             risk_level: result.risk_level,
-
             flags: result.flags
-
         });
 
-        const sanctions = tx.enrichment?.sanctions || {};
-        const ipIntel = tx.enrichment?.ipIntel || {};
-        const adverseMedia = tx.enrichment?.adverseMedia || {};
+        const sanctions = enrichment.sanctions || {};
+        const ipIntel = enrichment.ipIntel || {};
+        const adverseMedia = enrichment.adverseMedia || {};
 
         return {
 
-            ...tx,
+            transaction,
 
-            transaction_id: tx.transaction_id,
+            enrichment,
 
-            account_id: tx.account_id,
+            qa: {
 
-            customer_name: tx.customer_name,
+                transaction_id: transaction.transaction_id,
 
-            risk_score: result.risk_score,
+                account_id: transaction.account_id,
 
-            confidence_score: result.confidence_score,
+                query_prompt: queryPrompt,
 
-            risk_level: result.risk_level,
+                sql_generated: sqlGenerated,
 
-            sanctions_match: sanctions.matched || false,
+                risk_score: result.risk_score,
 
-            pep_match: sanctions.pep || false,
+                confidence_score: result.confidence_score,
 
-            vpn_detected: ipIntel.vpn || false,
+                risk_level: result.risk_level,
 
-            proxy_detected: ipIntel.proxy || false,
+                sanctions_match: sanctions.matched || false,
 
-            adverse_media_match: adverseMedia.matched || false,
+                pep_match: sanctions.pep || false,
 
-            action_recommended: tx.action_recommended || null,
+                vpn_detected: ipIntel.vpn || false,
 
-            compliance_verdict: result.flags.length
-                ? `Deterministic AML screening flagged: ${result.flags.join(", ")}`
-                : "No deterministic AML flags detected.",
+                proxy_detected: ipIntel.proxy || false,
 
-            flags: result.flags,
+                adverse_media_match: adverseMedia.matched || false,
 
-            enrichment_data: tx.enrichment,
+                ip_country: enrichment.ipCountry || ipIntel.country || null,
 
-            aml_rule_results: result,
+                transaction_country: enrichment.transactionCountry || transaction.country || transaction.location || null,
 
-            analysed_at: new Date().toISOString()
+                exchange_rate: enrichment.exchangeRate ?? null,
+
+                usd_amount: enrichment.usdAmount ?? null,
+
+                structuring_detected: result.structuringDetected || false,
+
+                layering_detected: result.layeringDetected || false,
+
+                high_velocity_detected: result.highVelocityDetected || false,
+
+                high_risk_jurisdiction: result.highRiskJurisdiction || false,
+
+                behavioral_anomaly: result.behavioralAnomaly || false,
+
+                ubo_risk: result.uboRisk || false,
+
+                sanctions_source: result.sanctionsSource || enrichment.sanctionsSource || "OpenSanctions",
+
+                pep_source: result.pepSource ?? enrichment.pepSource ?? null,
+
+                adverse_media_links: Array.isArray(enrichment.adverseMediaLinks) ? enrichment.adverseMediaLinks : [],
+
+                flags: result.flags,
+
+                compliance_verdict: result.flags.length
+                    ? `Deterministic AML screening flagged: ${result.flags.join(", ")}`
+                    : "No deterministic AML flags detected.",
+
+                aml_rule_results: result,
+
+                analysed_at: new Date().toISOString()
+
+            },
+
+            investigation: {
+                compliance_verdict:
+                    "Transaction classified as LOW RISK. No significant AML indicators were detected. Continue routine monitoring.",
+                skipped: true
+            },
+
+            decision: {}
 
         };
 
     });
 
     console.log("QA Complete");
+    console.log("Routing");
+    console.log(`LOW: ${lowCount}`);
+    console.log(`MEDIUM: ${mediumCount}`);
+    console.log(`HIGH: ${highCount}`);
 
     return {
 
-        ...state,
-
         ruleResults,
 
-        reports
+        reports,
+
+        graphMetrics: {
+            nodesExecuted: ["qaNode"],
+            apiCalls: 0,
+            retries: 0,
+            failedApis: []
+        }
 
     };
 
