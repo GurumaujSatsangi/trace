@@ -321,8 +321,28 @@ Return ONLY the raw SQL query string with no markdown and no extra text.`;
         try {
             queryResults = await runDuckQuery(generatedSql);
         } catch (dbError) {
+            let friendlyError = "I couldn't process this request due to a data format issue.";
+            try {
+                const errorPrompt = `The user asked: "${message}"\nThe generated SQL query failed with this technical error:\n${dbError.message}\n\nExplain why this failed in ONE simple, non-technical sentence that speaks directly to the user (e.g. "I cannot search for a name directly inside a list of links."). Do not mention SQL, databases, or technical terms like "Binder Error".`;
+                const aiErrRes = await model.invoke([new HumanMessage(errorPrompt)]);
+                friendlyError = aiErrRes.content.replace(/"/g, '').trim();
+            } catch (e) {
+                console.error("Failed to generate friendly error:", e);
+            }
             return res.status(400).json({
-                error: "SQL_ERROR"
+                error: "SQL_ERROR",
+                details: friendlyError
+            });
+        }
+
+        if (queryResults.length === 0) {
+            return res.json({
+                success: true,
+                query: message,
+                sql: generatedSql,
+                results: [],
+                complianceVerdict: "I couldn't find any data matching your request in the current dataset. Please try broadening your search or checking your spelling.",
+                timestamp: new Date().toISOString()
             });
         }
 

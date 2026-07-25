@@ -407,7 +407,16 @@
                         }
                     }, 1000);
                 } else if (result.error === "SQL_ERROR") {
-                    appendAiMessage(`<div style="color: #dc2626; font-weight: 500; font-size: 14.5px;">Please try again.</div>`);
+                    let errorMessage = result.details || "The query generated was invalid.";
+                    appendAiMessage(`
+                        <div style="color: #dc2626; font-weight: 500; font-size: 14.5px; margin-bottom: 8px;">
+                            Oops, I had trouble understanding or querying the database.
+                        </div>
+                        <div style="font-size: 13.5px; color: #475569; background: #fee2e2; padding: 12px; border-radius: 6px; border: 1px solid #fca5a5;">
+                            <strong>Error Details:</strong><br>
+                            ${String(errorMessage).replace(/</g, '&lt;')}
+                        </div>
+                    `);
                 } else {
                     appendAiMessage(`<div style="color: #dc2626; font-weight: 500;">Error:</div><pre class="sql-pre">${JSON.stringify(result, null, 2)}</pre>`);
                 }
