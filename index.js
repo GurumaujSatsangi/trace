@@ -122,17 +122,9 @@ const runDuckQuery = (sqlQuery) => {
     });
 };
 
-// 1. Endpoint to handle CSV file uploads from the frontend
-// app.post("/api/upload", upload.single("csvFile"), (req, res) => {
-//     if (!req.file) {
-//         return res.status(400).json({ error: "No file uploaded." });
-//     }
-//     res.json({
-//         success: true,
-//         message: "Dataset uploaded successfully!",
-//         filename: req.file.originalname
-//     });
-// });
+app.get("/",async(req,res)=>{
+    return res.render("home.ejs");
+})
 
 // 2. Chat & Compliance Analysis Endpoint
 app.post("/api/chat", async (req, res) => {

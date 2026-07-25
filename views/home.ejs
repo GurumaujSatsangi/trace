@@ -3,21 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>TRACE - Compliance Engine</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 850px; margin: 40px auto; padding: 0 20px; background: #f8f9fa; color: #333; }
+        .card { background: white; padding: 24px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; }
+        h1 { color: #1e293b; margin-bottom: 5px; }
+        h2 { margin-top: 0; color: #0f172a; font-size: 1.25rem; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; }
+        input[type="file"], textarea { width: 100%; padding: 12px; margin: 12px 0; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 14px; }
+        textarea { height: 90px; resize: vertical; }
+        button { background: #2563eb; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; transition: background 0.2s; }
+        button:hover { background: #1d4ed8; }
+        pre { background: #0f172a; color: #e2e8f0; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+        .success { color: #16a34a; font-weight: 600; margin-top: 8px; }
+        .error { color: #dc2626; font-weight: 600; margin-top: 8px; }
+        .subtitle { color: #64748b; margin-bottom: 24px; }
+    </style>
 </head>
 <body>
 
-    <h1>Welcome!</h1>
+    <h1>TRACE</h1>
+    <p class="subtitle">Transaction Risk Analysis & Compliance Engine</p>
 
-    <form action="/api/chat" method="post">
+    <!-- 1. CSV Upload Section -->
+    <div class="card">
+        <h2>1. Upload Transaction Dataset (CSV)</h2>
+        <form id="uploadForm">
+            <input type="file" name="csvFile" id="csvFile" accept=".csv" required>
+            <button type="submit">Upload and Sync to Supabase</button>
+        </form>
+        <div id="uploadStatus"></div>
+    </div>
 
-        <textarea name="message" placeholder="Enter your query here!">
+    <!-- 2. Chat / Query Section -->
+    <div class="card">
+        <h2>2. Query Data with AI Compliance Agent</h2>
+        <form id="chatForm">
+            <textarea name="message" id="messageInput" placeholder="e.g., Is account ACC-4521 suspicious? Or show all high-value transactions..." required></textarea>
+            <button type="submit">Run Agent Analysis</button>
+        </form>
+    </div>
 
-        </textarea>
+    <!-- 3. Response / Result Display Section -->
+    <div class="card">
+        <h2>System Response & Audit Log</h2>
+        <pre id="outputLog">Ready for input...</pre>
+    </div>
 
-<button type="submit">Submit</button>
+    <script>
+        // Handle CSV Upload
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData();
+            const fileField = document.getElementById('csvFile');
+            const statusEl = document.getElementById('uploadStatus');
+            const outputLog = document.getElementById('outputLog');
 
-    </form>
-    
+            if (fileField.files.length === 0) return;
+            formData.append('csvFile', fileField.files[0]);
+
+            statusEl.innerHTML = "Uploading and parsing records into Supabase...";
+            statusEl.className = "";
+            outputLog.textContent = "Processing upload request...";
+
+            try {
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                
+                if (response.ok) {
+                    statusEl.innerHTML = `✓ ${result.message}`;
+                    statusEl.className = "success";
+                    outputLog.textContent = JSON.stringify(result, null, 2);
+                } else {
+                    statusEl.innerHTML = `✗ Error: ${result.error || 'Upload failed'}`;
+                    statusEl.className = "error";
+                    outputLog.textContent = JSON.stringify(result, null, 2);
+                }
+            } catch (err) {
+                statusEl.innerHTML = `✗ Network error during upload.`;
+                statusEl.className = "error";
+                outputLog.textContent = err.message;
+            }
+        });
+
+        // Handle Chat Query
+        document.getElementById('chatForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const message = document.getElementById('messageInput').value;
+            const outputLog = document.getElementById('outputLog');
+
+            outputLog.textContent = "Querying Supabase via Groq Text-to-SQL and running AML analysis...";
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message })
+                });
+                const result = await response.json();
+
+                outputLog.textContent = JSON.stringify(result, null, 2);
+            } catch (err) {
+                outputLog.textContent = "Error processing chat request.";
+                console.error(err);
+            }
+        });
+    </script>
+
 </body>
 </html>
