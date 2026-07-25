@@ -191,6 +191,21 @@
         <!-- Tabular View Area -->
         <main id="tabularView">
             <h2>Compliance Reports</h2>
+
+            <!-- Stat Cards -->
+            <div id="statsCards" style="display: flex; gap: 16px; margin-bottom: 24px;"></div>
+
+            <!-- Filter and Search Area -->
+            <div style="display: flex; gap: 12px; margin-bottom: 16px; align-items: center;">
+                <input type="text" id="searchInput" placeholder="Search by Account ID, Transaction ID, or Customer Name..." style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #d1d5db; font-size: 14px;">
+                <select id="riskFilter" style="padding: 10px; border-radius: 8px; border: 1px solid #d1d5db; font-size: 14px;">
+                    <option value="ALL">All Risk Levels</option>
+                    <option value="HIGH">High Risk</option>
+                    <option value="MEDIUM">Medium Risk</option>
+                    <option value="LOW">Low Risk</option>
+                </select>
+            </div>
+
             <div style="overflow-x: auto; border-radius: 8px; border: 1px solid #e5e7eb;">
                 <table class="reports-table">
                     <thead>
@@ -199,11 +214,12 @@
                             <th>Transaction ID</th>
                             <th>Risk Score</th>
                             <th>Risk Level</th>
+                            <th>Flags</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody id="reportsTableBody">
-                        <tr><td colspan="5" style="text-align: center; color: #64748b;">No data loaded.</td></tr>
+                        <tr><td colspan="6" style="text-align: center; color: #64748b;">No data loaded.</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -345,7 +361,13 @@
 
                     // Verdict
                     if (result.complianceVerdict) {
-                        aiHtml += `<div class="verdict-box">${result.complianceVerdict.replace(/\n/g, '<br>')}</div>`;
+                        let formattedVerdict = result.complianceVerdict.split(/(<(?:table|ul|ol)[\s\S]*?<\/(?:table|ul|ol)>)/i);
+                        for (let i = 0; i < formattedVerdict.length; i++) {
+                            if (!/^<(?:table|ul|ol)/i.test(formattedVerdict[i])) {
+                                formattedVerdict[i] = formattedVerdict[i].replace(/\n/g, '<br>');
+                            }
+                        }
+                        aiHtml += `<div class="verdict-box">${formattedVerdict.join('')}</div>`;
                     }
 
                     const highRiskTxns = result.results.filter(r => r.risk_level && r.risk_level.toUpperCase() === 'HIGH');
@@ -432,7 +454,7 @@
 
         async function loadReports() {
             const tbody = document.getElementById('reportsTableBody');
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 24px; color: #64748b;">Loading reports...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 24px; color: #64748b;">Loading reports...</td></tr>';
             try {
                 const res = await fetch('/api/reports');
                 const data = await res.json();
@@ -440,23 +462,87 @@
                     reportsCache = data.reports;
                     renderReports(data.reports);
                 } else {
-                    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #dc2626; padding: 24px;">Failed to load reports.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #dc2626; padding: 24px;">Failed to load reports.</td></tr>';
                 }
             } catch (err) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #dc2626; padding: 24px;">Error connecting to server.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #dc2626; padding: 24px;">Error connecting to server.</td></tr>';
             }
         }
 
+        const searchInput = document.getElementById('searchInput');
+        const riskFilter = document.getElementById('riskFilter');
+
+        searchInput.addEventListener('input', applyFilters);
+        riskFilter.addEventListener('change', applyFilters);
+
+        function applyFilters() {
+            const term = searchInput.value.toLowerCase();
+            const risk = riskFilter.value;
+
+            const filtered = reportsCache.filter(row => {
+                const reportData = row.report || row;
+                const tx = reportData.transaction || {};
+                const qa = reportData.qa || {};
+                
+                const accountId = (row.account_id || tx.account_id || '').toLowerCase();
+                const txId = (row.transaction_id || tx.transaction_id || qa.transaction_id || '').toLowerCase();
+                const name = (row.customer_name || tx.customer_name || '').toLowerCase();
+                
+                const riskLevel = (row.risk_level || qa.risk_level || 'N/A').toUpperCase();
+
+                const matchesSearch = accountId.includes(term) || txId.includes(term) || name.includes(term);
+                const matchesRisk = risk === 'ALL' || riskLevel === risk;
+
+                return matchesSearch && matchesRisk;
+            });
+
+            renderReportsTable(filtered);
+        }
+
+        function updateStats(reports) {
+            let high = 0, medium = 0, low = 0;
+            reports.forEach(row => {
+                const reportData = row.report || row;
+                const qa = reportData.qa || {};
+                const riskLevel = (row.risk_level || qa.risk_level || 'N/A').toUpperCase();
+                if (riskLevel === 'HIGH') high++;
+                else if (riskLevel === 'MEDIUM') medium++;
+                else if (riskLevel === 'LOW') low++;
+            });
+
+            const statsCards = document.getElementById('statsCards');
+            statsCards.innerHTML = `
+                <div style="flex: 1; padding: 16px; border-radius: 8px; border: 2px solid #dc2626; color: #dc2626; background: #fef2f2; text-align: center;">
+                    <div style="font-size: 14px; font-weight: 600; text-transform: uppercase; margin-bottom: 4px;">High Risk</div>
+                    <div style="font-size: 28px; font-weight: bold;">${high}</div>
+                </div>
+                <div style="flex: 1; padding: 16px; border-radius: 8px; border: 2px solid #d97706; color: #d97706; background: #fffbeb; text-align: center;">
+                    <div style="font-size: 14px; font-weight: 600; text-transform: uppercase; margin-bottom: 4px;">Medium Risk</div>
+                    <div style="font-size: 28px; font-weight: bold;">${medium}</div>
+                </div>
+                <div style="flex: 1; padding: 16px; border-radius: 8px; border: 2px solid #16a34a; color: #16a34a; background: #f0fdf4; text-align: center;">
+                    <div style="font-size: 14px; font-weight: 600; text-transform: uppercase; margin-bottom: 4px;">Low Risk</div>
+                    <div style="font-size: 28px; font-weight: bold;">${low}</div>
+                </div>
+            `;
+        }
+
         function renderReports(reports) {
+            updateStats(reports);
+            applyFilters();
+        }
+
+        function renderReportsTable(reports) {
             const tbody = document.getElementById('reportsTableBody');
             tbody.innerHTML = '';
             
             if (reports.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 24px; color: #64748b;">No compliance reports found. Please upload a dataset first.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 24px; color: #64748b;">No matching compliance reports found.</td></tr>';
                 return;
             }
 
-            reports.forEach((row, index) => {
+            reports.forEach((row) => {
+                const index = reportsCache.indexOf(row);
                 const reportData = row.report || row; 
                 const qa = reportData.qa || {};
                 const tx = reportData.transaction || {};
@@ -469,8 +555,28 @@
                 else if (qa.risk_score !== undefined && qa.risk_score !== null) riskScore = qa.risk_score;
 
                 const riskLevel = row.risk_level || qa.risk_level || 'N/A';
-
                 const riskColor = riskLevel === 'HIGH' ? '#dc2626' : (riskLevel === 'MEDIUM' ? '#d97706' : '#16a34a');
+
+                let flagsHtml = '-';
+                const flagsArr = row.flags || qa.flags || [];
+                if (Array.isArray(flagsArr) && flagsArr.length > 0) {
+                    flagsHtml = '<div style="display: flex; gap: 4px; flex-wrap: wrap;">';
+                    flagsArr.forEach(flag => {
+                        flagsHtml += `<span style="background: #f1f5f9; color: #475569; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 600;">${String(flag).replace(/</g, '&lt;')}</span>`;
+                    });
+                    flagsHtml += '</div>';
+                } else if (typeof flagsArr === 'string') {
+                    try {
+                        const parsed = JSON.parse(flagsArr);
+                        if (Array.isArray(parsed) && parsed.length > 0) {
+                            flagsHtml = '<div style="display: flex; gap: 4px; flex-wrap: wrap;">';
+                            parsed.forEach(flag => {
+                                flagsHtml += `<span style="background: #f1f5f9; color: #475569; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 600;">${String(flag).replace(/</g, '&lt;')}</span>`;
+                            });
+                            flagsHtml += '</div>';
+                        }
+                    } catch(e) {}
+                }
 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
@@ -478,6 +584,7 @@
                     <td>${txId}</td>
                     <td>${riskScore}</td>
                     <td><span style="font-weight: 600; color: ${riskColor}">${riskLevel}</span></td>
+                    <td>${flagsHtml}</td>
                     <td><button class="btn-view-details" onclick="openReportModal(${index})">View Details</button></td>
                 `;
                 tbody.appendChild(tr);
@@ -530,7 +637,19 @@
                     });
                     displayValue += '</div>';
                 } else if (typeof value === 'object' && value !== null) {
-                    displayValue = createTableFromJSON(value, depth + 1);
+                    const nestedTable = createTableFromJSON(value, depth + 1);
+                    if (depth <= 2) {
+                        displayValue = `<details style="border: 1px solid #e5e7eb; border-radius: 6px; margin: 4px 0;">
+                            <summary style="padding: 8px 12px; background: #f8fafc; cursor: pointer; font-size: 13px; font-weight: 500; color: #475569; border-bottom: 1px solid #e5e7eb;">
+                                Expand to view data
+                            </summary>
+                            <div style="padding: 0; overflow-x: auto;">
+                                ${nestedTable}
+                            </div>
+                        </details>`;
+                    } else {
+                        displayValue = nestedTable;
+                    }
                 } else {
                     let strVal = String(value);
                     if (strVal.startsWith('http')) {
@@ -601,7 +720,7 @@
         }
 
         function closeModal(modalId) {
-            document.getElementById(modalId).classList.remove('active');
+            document.getElementById(modalId).style.display = 'none';
         }
 
         async function downloadSAR(txnDataEncoded, verdictEncoded) {

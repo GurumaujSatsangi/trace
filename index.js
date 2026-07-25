@@ -332,6 +332,7 @@ Retrieved Data (Result of the database query for the user's question):
 ${JSON.stringify(queryResults, (key, value) => typeof value === 'bigint' ? value.toString() : value, 2)}
 
 Analyze these records for suspicious patterns and provide a professional compliance verdict.
+CRITICAL: If the user asks for a list, table, or specific records, you MUST explicitly output the retrieved data in a clear HTML table (using <table>, <thead>, <tbody>, <tr>, <th>, <td>) or an HTML list (<ul>/<li>) before your analysis. Do NOT use markdown tables.
 Note: The retrieved data directly corresponds to the User Question, even if certain identifying columns (like account_id) were omitted from the SQL SELECT clause.
 Do not invent facts that are not present in the retrieved data.
 Return the sources from news screening and PEP only when necessary.
