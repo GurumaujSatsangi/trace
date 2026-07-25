@@ -2,18 +2,23 @@ import { Annotation } from "@langchain/langgraph";
 
 export const TransactionState = Annotation.Root({
 
-    transaction: Annotation(),
+    // Uploaded transactions from Supabase
+    transactions: Annotation(),
 
-    enrichedData: Annotation(),
+    // Transactions after enrichment
+    enrichedTransactions: Annotation(),
 
+    // AML Rule Outputs and QA reports
     ruleResults: Annotation(),
 
-    confidenceScore: Annotation(),
+    // Final Reports
+    reports: Annotation(),
 
-    riskLevel: Annotation(),
+    // Metadata
+    startedAt: Annotation(),
+    completedAt: Annotation(),
 
-    flags: Annotation(),
-
-    report: Annotation()
+    // Incoming prompt for the current analysis run
+    query_prompt: Annotation()
 
 });
