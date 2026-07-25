@@ -1,16 +1,101 @@
 transaction_id,account_id,customer_name,amount,currency,transaction_type,timestamp,location,sender_name,beneficiary_name,beneficiary_account,sender_bank,receiver_bank,ip_address,device_id,country,destination_country,payment_method,merchant,channel
 TXN0001,ACC1001,Rajesh Kumar,2500,USD,Transfer,2025-07-25T09:15:00Z,New Delhi,Rajesh Kumar,Priya Sharma,BA1001,HDFC Bank,ICICI Bank,8.8.8.8,DEV1001,India,India,NEFT,Retail Payment,Internet Banking
-TXN0002,ACC1002,Narendra Modi,9800,USD,Cash Deposit,2025-07-25T10:10:00Z,New Delhi,Narendra Modi,Narendra Modi,BA1002,SBI,SBI,1.1.1.1,DEV1002,India,India,Cash,N/A,Branch
-TXN0003,ACC1002,Narendra Modi,9700,USD,Cash Deposit,2025-07-25T10:40:00Z,New Delhi,Narendra Modi,Narendra Modi,BA1002,SBI,SBI,1.1.1.1,DEV1002,India,India,Cash,N/A,Branch
-TXN0004,ACC1002,Narendra Modi,9950,USD,Cash Deposit,2025-07-25T11:10:00Z,New Delhi,Narendra Modi,Narendra Modi,BA1002,SBI,SBI,1.1.1.1,DEV1002,India,India,Cash,N/A,Branch
+TXN0002,ACC1002,Narendra Modi,9800,USD,Cash Deposit,2025-07-25T10:10:00Z,New Delhi,Narendra Modi,Narendra Modi,BA1002,SBI,SBI,1.1.1.1,DEV1002,India,India,Cash,,Branch
+TXN0003,ACC1002,Narendra Modi,9700,USD,Cash Deposit,2025-07-25T10:40:00Z,New Delhi,Narendra Modi,Narendra Modi,BA1002,SBI,SBI,1.1.1.1,DEV1002,India,India,Cash,,Branch
+TXN0004,ACC1002,Narendra Modi,9950,USD,Cash Deposit,2025-07-25T11:10:00Z,New Delhi,Narendra Modi,Narendra Modi,BA1002,SBI,SBI,1.1.1.1,DEV1002,India,India,Cash,,Branch
 TXN0005,ACC1003,Rahul Gandhi,125000,EUR,International Transfer,2025-07-25T11:30:00Z,Delhi,Rahul Gandhi,Global Holdings Ltd,BH1001,HDFC Bank,HSBC,185.220.101.1,DEV1003,India,Iran,SWIFT,Consulting,Corporate Banking
 TXN0006,ACC1004,Amit Shah,85000,USD,Wire Transfer,2025-07-25T12:10:00Z,Gandhinagar,Amit Shah,ABC International,BH1002,SBI,Barclays,104.244.72.115,DEV1004,India,Myanmar,SWIFT,Government Services,Corporate Banking
 TXN0007,ACC1005,Mamata Banerjee,2200,USD,Debit Card,2025-07-25T13:15:00Z,Kolkata,Mamata Banerjee,Local Merchant,MER1001,Axis Bank,Axis Bank,49.36.100.22,DEV1005,India,India,Card,Local Merchant,POS
 TXN0008,ACC1006,Arvind Kejriwal,76000,GBP,International Transfer,2025-07-25T14:05:00Z,Delhi,Arvind Kejriwal,Blue Ocean Ltd,BH1003,ICICI Bank,Standard Chartered,198.51.100.45,DEV1006,India,United Kingdom,SWIFT,Blue Ocean Ltd,Corporate Banking
 TXN0009,ACC1007,Nirmala Sitharaman,300000,USD,Wire Transfer,2025-07-25T15:10:00Z,New Delhi,Nirmala Sitharaman,Unknown Holdings,BH1004,SBI,Swiss Bank,203.0.113.15,DEV1007,India,North Korea,SWIFT,Unknown Holdings,Corporate Banking
-TXN0010,ACC1008,Yogi Adityanath,950,USD,ATM Withdrawal,2025-07-25T15:45:00Z,Lucknow,Yogi Adityanath,Self,SELF001,PNB,PNB,8.8.4.4,DEV1008,India,India,ATM,N/A,ATM
+TXN0010,ACC1008,Yogi Adityanath,950,USD,ATM Withdrawal,2025-07-25T15:45:00Z,Lucknow,Yogi Adityanath,Self,SELF001,PNB,PNB,8.8.4.4,DEV1008,India,India,ATM,,ATM
 TXN0011,ACC1009,Mukesh Ambani,15000,USD,Corporate Transfer,2025-07-25T16:20:00Z,Mumbai,Mukesh Ambani,Reliance Trading,BH1005,HDFC Bank,HSBC,52.95.245.10,DEV1009,India,Singapore,Wire,Reliance Trading,Corporate Banking
 TXN0012,ACC1010,Gautam Adani,240000,USD,International Transfer,2025-07-25T17:00:00Z,Ahmedabad,Gautam Adani,Adani Global,BH1006,Axis Bank,DBS,45.83.64.1,DEV1010,India,United Arab Emirates,SWIFT,Adani Global,Corporate Banking
 TXN0013,ACC1011,Ratan Tata,5000,USD,Transfer,2025-07-25T17:40:00Z,Mumbai,Ratan Tata,Tata Trust,TR1001,SBI,HDFC Bank,142.250.183.110,DEV1011,India,India,RTGS,Tata Trust,Internet Banking
 TXN0014,ACC1012,Sunil Bharti Mittal,92000,USD,International Transfer,2025-07-25T18:15:00Z,Delhi,Sunil Bharti Mittal,Airtel Global,BH1007,Axis Bank,Citi,45.90.28.0,DEV1012,India,Cayman Islands,SWIFT,Airtel Global,Corporate Banking
 TXN0015,ACC1013,Rajesh Kumar,1800,USD,UPI Payment,2025-07-25T18:45:00Z,Bengaluru,Rajesh Kumar,Cafe Coffee Day,MER2001,Kotak Bank,HDFC Bank,49.36.110.10,DEV1013,India,India,UPI,Cafe Coffee Day,Mobile Banking
+TXN0016,ACC1016,Vivaan Kapoor,500,USD,Wire Transfer,2025-07-25T13:00:00Z,Hyderabad,Vivaan Kapoor,Meera Verma,BA2016,IndusInd Bank,SBI,186.8.33.58,DEV2016,India,Singapore,Wire,Flipkart,Branch
+TXN0017,ACC1017,Aisha Verma,12000,USD,Wire Transfer,2025-07-25T13:15:00Z,Mumbai,Aisha Verma,Vikram Gupta,BA2017,Kotak Bank,HDFC Bank,100.40.77.178,DEV2017,India,United Kingdom,RTGS,Consulting,POS
+TXN0018,ACC1018,Priya Patel,42000,USD,Cash Deposit,2025-07-25T13:30:00Z,Kolkata,Priya Patel,Vivaan Gupta,BA2018,HDFC Bank,Axis Bank,86.184.35.237,DEV2018,India,Singapore,UPI,Cafe Coffee Day,Internet Banking
+TXN0019,ACC1019,Sanjay Gupta,1200,USD,Corporate Transfer,2025-07-25T13:45:00Z,Kolkata,Sanjay Gupta,Nitin Reddy,BA2019,IndusInd Bank,SBI,62.142.109.163,DEV2019,India,Singapore,IMPS,Investment,ATM
+TXN0020,ACC1020,Karan Joshi,150,USD,UPI Payment,2025-07-25T14:00:00Z,Pune,Karan Joshi,Priya Malhotra,BA2020,Axis Bank,Kotak Bank,189.28.156.92,DEV2020,India,United States,NEFT,Zomato,Mobile Banking
+TXN0021,ACC1021,Aisha Iyer,4800,USD,Cash Deposit,2025-07-25T14:15:00Z,Kolkata,Aisha Iyer,Rohan Singh,BA2021,HDFC Bank,Kotak Bank,124.212.249.186,DEV2021,India,United Arab Emirates,UPI,Zomato,Branch
+TXN0022,ACC1022,Sneha Iyer,12000,USD,Cash Deposit,2025-07-25T14:30:00Z,Lucknow,Sneha Iyer,Neha Reddy,BA2022,Kotak Bank,Axis Bank,217.19.23.34,DEV2022,India,United Kingdom,RTGS,Salary,Corporate Banking
+TXN0023,ACC1023,Rahul Gupta,250,USD,Transfer,2025-07-25T14:45:00Z,Kolkata,Rahul Gupta,Ananya Mehta,BA2023,PNB,Axis Bank,150.147.142.211,DEV2023,India,Cayman Islands,Cash,Hospital,Branch
+TXN0024,ACC1024,Nitin Mehta,76000,USD,Debit Card,2025-07-25T15:00:00Z,Mumbai,Nitin Mehta,Ananya Reddy,BA2024,Kotak Bank,Kotak Bank,195.134.69.178,DEV2024,India,United Kingdom,Cash,Salary,Mobile Banking
+TXN0025,ACC1025,Aisha Reddy,12000,USD,International Transfer,2025-07-25T15:15:00Z,Hyderabad,Aisha Reddy,Ananya Iyer,BA2025,SBI,Axis Bank,170.2.244.27,DEV2025,India,United Arab Emirates,SWIFT,Reliance Retail,POS
+TXN0026,ACC1026,Rohan Nair,1200,USD,International Transfer,2025-07-25T15:30:00Z,Kolkata,Rohan Nair,Nitin Nair,BA2026,Axis Bank,SBI,160.250.19.244,DEV2026,India,United Arab Emirates,Card,Swiggy,ATM
+TXN0027,ACC1027,Neha Kapoor,250,USD,Wire Transfer,2025-07-25T15:45:00Z,Mumbai,Neha Kapoor,Nitin Patel,BA2027,HDFC Bank,SBI,151.63.224.218,DEV2027,India,United Arab Emirates,Cash,Reliance Retail,Internet Banking
+TXN0028,ACC1028,Kavya Bose,18500,USD,Corporate Transfer,2025-07-25T16:00:00Z,Bengaluru,Kavya Bose,Sneha Joshi,BA2028,Kotak Bank,ICICI Bank,59.73.98.59,DEV2028,India,United Arab Emirates,Cash,Salary,Internet Banking
+TXN0029,ACC1029,Deepak Das,4800,USD,Corporate Transfer,2025-07-25T16:15:00Z,Lucknow,Deepak Das,Aditya Verma,BA2029,IndusInd Bank,PNB,64.72.51.61,DEV2029,India,United Kingdom,NEFT,Flipkart,POS
+TXN0030,ACC1030,Karan Kapoor,12000,USD,Debit Card,2025-07-25T16:30:00Z,Hyderabad,Karan Kapoor,Meera Nair,BA2030,HDFC Bank,Kotak Bank,138.248.169.177,DEV2030,India,Singapore,UPI,Swiggy,Internet Banking
+TXN0031,ACC1031,Nitin Chopra,2500,USD,International Transfer,2025-07-25T16:45:00Z,Chennai,Nitin Chopra,Varun Singh,BA2031,HDFC Bank,PNB,38.11.49.238,DEV2031,India,Singapore,RTGS,Cafe Coffee Day,ATM
+TXN0032,ACC1032,Ritika Iyer,500,USD,International Transfer,2025-07-25T17:00:00Z,Delhi,Ritika Iyer,Rahul Das,BA2032,Kotak Bank,IndusInd Bank,42.235.198.219,DEV2032,India,United Arab Emirates,Wire,Cafe Coffee Day,Mobile Banking
+TXN0033,ACC1033,Neha Sharma,12000,USD,Debit Card,2025-07-25T17:15:00Z,Bengaluru,Neha Sharma,Sneha Mehta,BA2033,SBI,PNB,54.101.28.191,DEV2033,India,Cayman Islands,UPI,Flipkart,Internet Banking
+TXN0034,ACC1034,Sneha Reddy,12000,USD,Cash Deposit,2025-07-25T17:30:00Z,Kolkata,Sneha Reddy,Deepak Patel,BA2034,HDFC Bank,Axis Bank,148.124.238.120,DEV2034,India,Cayman Islands,Card,School Fees,Mobile Banking
+TXN0035,ACC1035,Karan Malhotra,8200,USD,International Transfer,2025-07-25T17:45:00Z,Bengaluru,Karan Malhotra,Pooja Joshi,BA2035,Kotak Bank,SBI,84.163.61.115,DEV2035,India,United Kingdom,UPI,Hospital,Corporate Banking
+TXN0036,ACC1036,Rohan Joshi,150,USD,Wire Transfer,2025-07-25T18:00:00Z,Hyderabad,Rohan Joshi,Karan Kapoor,BA2036,SBI,SBI,146.200.194.19,DEV2036,India,United States,UPI,DMart,Mobile Banking
+TXN0037,ACC1037,Kavya Mehta,250,USD,Wire Transfer,2025-07-25T18:15:00Z,Mumbai,Kavya Mehta,Sanjay Kapoor,BA2037,Axis Bank,SBI,147.168.254.145,DEV2037,India,Singapore,Card,Reliance Retail,POS
+TXN0038,ACC1038,Deepak Mehta,12000,USD,Wire Transfer,2025-07-25T18:30:00Z,Chennai,Deepak Mehta,Aisha Kapoor,BA2038,ICICI Bank,Axis Bank,134.124.110.34,DEV2038,India,Cayman Islands,SWIFT,Flipkart,Branch
+TXN0039,ACC1039,Sneha Gupta,2500,USD,Corporate Transfer,2025-07-25T18:45:00Z,Lucknow,Sneha Gupta,Rohan Malhotra,BA2039,HDFC Bank,Axis Bank,37.49.85.1,DEV2039,India,United States,UPI,BigBasket,Mobile Banking
+TXN0040,ACC1040,Vikram Bose,2500,USD,Transfer,2025-07-25T19:00:00Z,Kolkata,Vikram Bose,Aditya Nair,BA2040,ICICI Bank,ICICI Bank,141.149.97.5,DEV2040,India,Cayman Islands,RTGS,Cafe Coffee Day,POS
+TXN0041,ACC1041,Sneha Das,4800,USD,Wire Transfer,2025-07-25T19:15:00Z,Lucknow,Sneha Das,Vikram Das,BA2041,IndusInd Bank,IndusInd Bank,166.195.73.32,DEV2041,India,Cayman Islands,IMPS,Reliance Retail,Corporate Banking
+TXN0042,ACC1042,Meera Das,42000,USD,International Transfer,2025-07-25T19:30:00Z,Mumbai,Meera Das,Aarav Sharma,BA2042,Kotak Bank,Axis Bank,201.149.49.201,DEV2042,India,Cayman Islands,IMPS,School Fees,ATM
+TXN0043,ACC1043,Varun Iyer,750,USD,Debit Card,2025-07-25T19:45:00Z,Hyderabad,Varun Iyer,Aditya Reddy,BA2043,Axis Bank,ICICI Bank,32.102.140.72,DEV2043,India,United Arab Emirates,Cash,Swiggy,Internet Banking
+TXN0044,ACC1044,Pooja Chopra,18500,USD,International Transfer,2025-07-25T20:00:00Z,Chennai,Pooja Chopra,Neha Verma,BA2044,HDFC Bank,IndusInd Bank,28.170.241.36,DEV2044,India,India,SWIFT,Amazon,Branch
+TXN0045,ACC1045,Meera Chopra,76000,USD,Debit Card,2025-07-25T20:15:00Z,Pune,Meera Chopra,Vikram Das,BA2045,Kotak Bank,SBI,171.83.83.5,DEV2045,India,United States,RTGS,Zomato,Internet Banking
+TXN0046,ACC1046,Rohan Gupta,500,USD,Corporate Transfer,2025-07-25T20:30:00Z,Kolkata,Rohan Gupta,Karan Das,BA2046,ICICI Bank,Kotak Bank,187.183.210.200,DEV2046,India,United States,SWIFT,DMart,POS
+TXN0047,ACC1047,Ananya Nair,4800,USD,International Transfer,2025-07-25T20:45:00Z,Jaipur,Ananya Nair,Vivaan Bose,BA2047,ICICI Bank,IndusInd Bank,104.145.206.250,DEV2047,India,United Arab Emirates,UPI,Consulting,Mobile Banking
+TXN0048,ACC1048,Neha Verma,76000,USD,Transfer,2025-07-25T21:00:00Z,Hyderabad,Neha Verma,Vivaan Reddy,BA2048,ICICI Bank,SBI,166.159.216.70,DEV2048,India,India,Wire,Salary,Mobile Banking
+TXN0049,ACC1049,Ananya Mehta,18500,USD,Corporate Transfer,2025-07-25T21:15:00Z,Hyderabad,Ananya Mehta,Vikram Patel,BA2049,HDFC Bank,PNB,222.111.37.96,DEV2049,India,India,Wire,DMart,POS
+TXN0050,ACC1050,Pooja Nair,12000,USD,UPI Payment,2025-07-25T21:30:00Z,Kolkata,Pooja Nair,Aisha Reddy,BA2050,SBI,HDFC Bank,148.39.179.118,DEV2050,India,United Kingdom,RTGS,Hospital,Branch
+TXN0051,ACC1051,Rahul Patel,4800,USD,Debit Card,2025-07-25T21:45:00Z,Kolkata,Rahul Patel,Varun Iyer,BA2051,SBI,ICICI Bank,76.140.25.181,DEV2051,India,Cayman Islands,Wire,DMart,Mobile Banking
+TXN0052,ACC1052,Nitin Kapoor,150,USD,UPI Payment,2025-07-25T22:00:00Z,Hyderabad,Nitin Kapoor,Vikram Singh,BA2052,HDFC Bank,SBI,98.201.82.108,DEV2052,India,United States,Cash,Hospital,Branch
+TXN0053,ACC1053,Aarav Iyer,150,USD,International Transfer,2025-07-25T22:15:00Z,Pune,Aarav Iyer,Vikram Sharma,BA2053,ICICI Bank,PNB,88.192.24.72,DEV2053,India,India,IMPS,Flipkart,ATM
+TXN0054,ACC1054,Sanjay Gupta,76000,USD,Wire Transfer,2025-07-25T22:30:00Z,Delhi,Sanjay Gupta,Sanjay Gupta,BA2054,Axis Bank,Axis Bank,49.212.200.110,DEV2054,India,Cayman Islands,Wire,Consulting,Branch
+TXN0055,ACC1055,Sanjay Malhotra,42000,USD,Debit Card,2025-07-25T22:45:00Z,Chennai,Sanjay Malhotra,Sneha Chopra,BA2055,Axis Bank,HDFC Bank,219.125.93.19,DEV2055,India,Singapore,NEFT,Salary,Internet Banking
+TXN0056,ACC1056,Neha Verma,750,USD,UPI Payment,2025-07-25T23:00:00Z,Mumbai,Neha Verma,Varun Iyer,BA2056,ICICI Bank,ICICI Bank,92.220.20.96,DEV2056,India,United Arab Emirates,SWIFT,Hospital,POS
+TXN0057,ACC1057,Rohan Singh,8200,USD,International Transfer,2025-07-25T23:15:00Z,Delhi,Rohan Singh,Sneha Kapoor,BA2057,IndusInd Bank,ICICI Bank,187.89.113.126,DEV2057,India,Singapore,Wire,Cafe Coffee Day,ATM
+TXN0058,ACC1058,Sanjay Joshi,500,USD,Transfer,2025-07-25T23:30:00Z,Delhi,Sanjay Joshi,Meera Verma,BA2058,IndusInd Bank,ICICI Bank,199.23.72.187,DEV2058,India,United Arab Emirates,IMPS,DMart,POS
+TXN0059,ACC1059,Varun Malhotra,18500,USD,Wire Transfer,2025-07-25T23:45:00Z,Hyderabad,Varun Malhotra,Rohan Joshi,BA2059,Kotak Bank,Axis Bank,118.21.68.83,DEV2059,India,United Kingdom,Cash,Cafe Coffee Day,Mobile Banking
+TXN0060,ACC1060,Sneha Reddy,8200,USD,Wire Transfer,2025-07-26T00:00:00Z,Ahmedabad,Sneha Reddy,Kavya Das,BA2060,Axis Bank,ICICI Bank,58.143.111.13,DEV2060,India,Cayman Islands,UPI,Hospital,Internet Banking
+TXN0061,ACC1061,Pooja Patel,4800,USD,Cash Deposit,2025-07-26T00:15:00Z,Mumbai,Pooja Patel,Meera Singh,BA2061,IndusInd Bank,Kotak Bank,174.130.69.199,DEV2061,India,Singapore,NEFT,Cafe Coffee Day,POS
+TXN0062,ACC1062,Rohan Chopra,250,USD,International Transfer,2025-07-26T00:30:00Z,Chennai,Rohan Chopra,Karan Verma,BA2062,ICICI Bank,ICICI Bank,206.92.116.195,DEV2062,India,United States,RTGS,Zomato,Mobile Banking
+TXN0063,ACC1063,Ananya Chopra,750,USD,International Transfer,2025-07-26T00:45:00Z,Chennai,Ananya Chopra,Neha Malhotra,BA2063,ICICI Bank,ICICI Bank,128.18.231.154,DEV2063,India,Cayman Islands,Card,Investment,Branch
+TXN0064,ACC1064,Ritika Chopra,2500,USD,Cash Deposit,2025-07-26T01:00:00Z,Ahmedabad,Ritika Chopra,Karan Gupta,BA2064,PNB,ICICI Bank,116.91.189.124,DEV2064,India,United Kingdom,Cash,Cafe Coffee Day,POS
+TXN0065,ACC1065,Ananya Chopra,1200,USD,Transfer,2025-07-26T01:15:00Z,Delhi,Ananya Chopra,Karan Iyer,BA2065,IndusInd Bank,IndusInd Bank,28.99.22.30,DEV2065,India,United Arab Emirates,Card,Investment,ATM
+TXN0066,ACC1066,Rohan Verma,12000,USD,UPI Payment,2025-07-26T01:30:00Z,Kolkata,Rohan Verma,Rohan Malhotra,BA2066,SBI,Axis Bank,75.204.158.111,DEV2066,India,United Arab Emirates,IMPS,School Fees,Branch
+TXN0067,ACC1067,Aditya Joshi,76000,USD,Cash Deposit,2025-07-26T01:45:00Z,Hyderabad,Aditya Joshi,Nitin Nair,BA2067,IndusInd Bank,HDFC Bank,34.195.98.214,DEV2067,India,United Arab Emirates,Cash,School Fees,Mobile Banking
+TXN0068,ACC1068,Aisha Nair,2500,USD,UPI Payment,2025-07-26T02:00:00Z,Bengaluru,Aisha Nair,Nitin Chopra,BA2068,ICICI Bank,SBI,57.214.179.36,DEV2068,India,United Kingdom,NEFT,Investment,Corporate Banking
+TXN0069,ACC1069,Aarav Patel,250,USD,Cash Deposit,2025-07-26T02:15:00Z,Chennai,Aarav Patel,Sanjay Verma,BA2069,IndusInd Bank,PNB,198.225.105.232,DEV2069,India,Singapore,IMPS,Swiggy,POS
+TXN0070,ACC1070,Vivaan Das,12000,USD,International Transfer,2025-07-26T02:30:00Z,Pune,Vivaan Das,Ananya Chopra,BA2070,HDFC Bank,Kotak Bank,99.189.78.129,DEV2070,India,United Kingdom,IMPS,School Fees,Internet Banking
+TXN0071,ACC1071,Pooja Das,1200,USD,International Transfer,2025-07-26T02:45:00Z,Hyderabad,Pooja Das,Rohan Sharma,BA2071,PNB,HDFC Bank,80.252.229.71,DEV2071,India,United Arab Emirates,IMPS,Amazon,Corporate Banking
+TXN0072,ACC1072,Deepak Singh,76000,USD,Wire Transfer,2025-07-26T03:00:00Z,Lucknow,Deepak Singh,Aisha Iyer,BA2072,Axis Bank,SBI,181.245.74.173,DEV2072,India,United Arab Emirates,RTGS,Reliance Retail,Mobile Banking
+TXN0073,ACC1073,Karan Chopra,2500,USD,Transfer,2025-07-26T03:15:00Z,Kolkata,Karan Chopra,Aisha Malhotra,BA2073,ICICI Bank,HDFC Bank,43.206.197.86,DEV2073,India,United Kingdom,RTGS,Zomato,Internet Banking
+TXN0074,ACC1074,Aditya Das,750,USD,UPI Payment,2025-07-26T03:30:00Z,Jaipur,Aditya Das,Sneha Gupta,BA2074,Kotak Bank,PNB,133.117.53.29,DEV2074,India,India,Card,Hospital,Branch
+TXN0075,ACC1075,Aarav Iyer,12000,USD,Debit Card,2025-07-26T03:45:00Z,Chennai,Aarav Iyer,Sneha Reddy,BA2075,SBI,SBI,147.160.25.98,DEV2075,India,United Kingdom,Card,Reliance Retail,Internet Banking
+TXN0076,ACC1076,Sanjay Iyer,42000,USD,Corporate Transfer,2025-07-26T04:00:00Z,Delhi,Sanjay Iyer,Varun Kapoor,BA2076,HDFC Bank,HDFC Bank,118.35.30.96,DEV2076,India,Cayman Islands,Cash,Reliance Retail,ATM
+TXN0077,ACC1077,Kavya Malhotra,2500,USD,Cash Deposit,2025-07-26T04:15:00Z,Kolkata,Kavya Malhotra,Sneha Iyer,BA2077,PNB,PNB,77.74.14.121,DEV2077,India,United Arab Emirates,Wire,Salary,POS
+TXN0078,ACC1078,Kavya Singh,2500,USD,Cash Deposit,2025-07-26T04:30:00Z,Kolkata,Kavya Singh,Rohan Iyer,BA2078,Axis Bank,PNB,114.200.92.61,DEV2078,India,United Kingdom,Wire,Swiggy,Corporate Banking
+TXN0079,ACC1079,Aisha Malhotra,18500,USD,Wire Transfer,2025-07-26T04:45:00Z,Ahmedabad,Aisha Malhotra,Vivaan Patel,BA2079,PNB,Axis Bank,24.143.26.30,DEV2079,India,India,SWIFT,Reliance Retail,Branch
+TXN0080,ACC1080,Rahul Patel,2500,USD,Corporate Transfer,2025-07-26T05:00:00Z,Lucknow,Rahul Patel,Sneha Gupta,BA2080,Kotak Bank,PNB,222.94.57.109,DEV2080,India,Cayman Islands,Wire,Hospital,Internet Banking
+TXN0081,ACC1081,Vivaan Iyer,250,USD,Cash Deposit,2025-07-26T05:15:00Z,Pune,Vivaan Iyer,Neha Reddy,BA2081,Kotak Bank,Axis Bank,89.121.121.169,DEV2081,India,Cayman Islands,UPI,Reliance Retail,Mobile Banking
+TXN0082,ACC1082,Meera Patel,4800,USD,Transfer,2025-07-26T05:30:00Z,Kolkata,Meera Patel,Aarav Iyer,BA2082,ICICI Bank,PNB,80.227.160.140,DEV2082,India,United Arab Emirates,IMPS,Salary,Mobile Banking
+TXN0083,ACC1083,Nitin Chopra,150,USD,Debit Card,2025-07-26T05:45:00Z,Kolkata,Nitin Chopra,Neha Sharma,BA2083,Axis Bank,ICICI Bank,76.150.2.28,DEV2083,India,India,Card,Salary,Corporate Banking
+TXN0084,ACC1084,Aarav Verma,500,USD,Wire Transfer,2025-07-26T06:00:00Z,Hyderabad,Aarav Verma,Kavya Patel,BA2084,ICICI Bank,Axis Bank,153.111.138.215,DEV2084,India,United Arab Emirates,RTGS,DMart,ATM
+TXN0085,ACC1085,Rahul Verma,1200,USD,Transfer,2025-07-26T06:15:00Z,Delhi,Rahul Verma,Aarav Das,BA2085,SBI,Axis Bank,95.29.158.198,DEV2085,India,Singapore,UPI,Cafe Coffee Day,Internet Banking
+TXN0086,ACC1086,Priya Gupta,500,USD,Corporate Transfer,2025-07-26T06:30:00Z,Mumbai,Priya Gupta,Aarav Nair,BA2086,Kotak Bank,Axis Bank,121.134.78.240,DEV2086,India,Singapore,RTGS,Hospital,Internet Banking
+TXN0087,ACC1087,Vivaan Mehta,76000,USD,Debit Card,2025-07-26T06:45:00Z,Chennai,Vivaan Mehta,Pooja Das,BA2087,Kotak Bank,IndusInd Bank,201.234.61.66,DEV2087,India,United Kingdom,NEFT,Amazon,POS
+TXN0088,ACC1088,Sneha Mehta,2500,USD,Corporate Transfer,2025-07-26T07:00:00Z,Chennai,Sneha Mehta,Nitin Verma,BA2088,Axis Bank,SBI,55.136.226.216,DEV2088,India,Cayman Islands,RTGS,BigBasket,Mobile Banking
+TXN0089,ACC1089,Pooja Malhotra,8200,USD,Cash Deposit,2025-07-26T07:15:00Z,Hyderabad,Pooja Malhotra,Varun Kapoor,BA2089,Axis Bank,ICICI Bank,39.162.40.164,DEV2089,India,United States,IMPS,Flipkart,Branch
+TXN0090,ACC1090,Aditya Nair,750,USD,Debit Card,2025-07-26T07:30:00Z,Chennai,Aditya Nair,Sanjay Sharma,BA2090,ICICI Bank,PNB,162.162.196.159,DEV2090,India,United Arab Emirates,Card,Cafe Coffee Day,Corporate Banking
+TXN0091,ACC1091,Vivaan Singh,8200,USD,Cash Deposit,2025-07-26T07:45:00Z,Hyderabad,Vivaan Singh,Aditya Malhotra,BA2091,PNB,Kotak Bank,201.135.199.87,DEV2091,India,United Kingdom,RTGS,BigBasket,Corporate Banking
+TXN0092,ACC1092,Meera Reddy,2500,USD,UPI Payment,2025-07-26T08:00:00Z,Ahmedabad,Meera Reddy,Karan Sharma,BA2092,Kotak Bank,Kotak Bank,141.70.226.123,DEV2092,India,United Kingdom,Cash,Hospital,Mobile Banking
+TXN0093,ACC1093,Rohan Verma,42000,USD,Wire Transfer,2025-07-26T08:15:00Z,Jaipur,Rohan Verma,Ritika Reddy,BA2093,Kotak Bank,Kotak Bank,170.150.21.233,DEV2093,India,United Arab Emirates,IMPS,DMart,Internet Banking
+TXN0094,ACC1094,Karan Joshi,250,USD,Debit Card,2025-07-26T08:30:00Z,Mumbai,Karan Joshi,Neha Malhotra,BA2094,ICICI Bank,ICICI Bank,172.128.135.4,DEV2094,India,United Arab Emirates,SWIFT,Investment,Corporate Banking
+TXN0095,ACC1095,Pooja Patel,42000,USD,Debit Card,2025-07-26T08:45:00Z,Delhi,Pooja Patel,Ritika Patel,BA2095,SBI,ICICI Bank,191.155.255.234,DEV2095,India,Cayman Islands,Wire,Reliance Retail,Corporate Banking
+TXN0096,ACC1096,Aarav Malhotra,250,USD,International Transfer,2025-07-26T09:00:00Z,Delhi,Aarav Malhotra,Varun Joshi,BA2096,Axis Bank,Axis Bank,152.183.125.124,DEV2096,India,United Arab Emirates,IMPS,Investment,Branch
+TXN0097,ACC1097,Kavya Reddy,42000,USD,Wire Transfer,2025-07-26T09:15:00Z,Ahmedabad,Kavya Reddy,Varun Gupta,BA2097,HDFC Bank,IndusInd Bank,61.185.107.158,DEV2097,India,United Kingdom,SWIFT,Swiggy,ATM
+TXN0098,ACC1098,Meera Bose,4800,USD,Transfer,2025-07-26T09:30:00Z,Lucknow,Meera Bose,Meera Sharma,BA2098,IndusInd Bank,IndusInd Bank,87.135.80.201,DEV2098,India,United Arab Emirates,UPI,Cafe Coffee Day,Branch
+TXN0099,ACC1099,Neha Joshi,18500,USD,Transfer,2025-07-26T09:45:00Z,Chennai,Neha Joshi,Nitin Bose,BA2099,ICICI Bank,Axis Bank,164.102.20.190,DEV2099,India,Cayman Islands,Cash,School Fees,Internet Banking
+TXN0100,ACC1100,Ananya Singh,2500,USD,Transfer,2025-07-26T10:00:00Z,Bengaluru,Ananya Singh,Ananya Malhotra,BA2100,SBI,IndusInd Bank,95.128.225.74,DEV2100,India,United Kingdom,IMPS,Cafe Coffee Day,Mobile Banking

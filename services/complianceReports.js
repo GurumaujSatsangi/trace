@@ -114,15 +114,17 @@ export async function saveComplianceReports(reports, graphState = {}) {
         });
     }
 
-    const { error } = await supabase
-        .from("compliance_reports")
-        .insert(payload);
+    const BATCH_SIZE = 25;
+    for (let i = 0; i < payload.length; i += BATCH_SIZE) {
+        const batch = payload.slice(i, i + BATCH_SIZE);
+        const { error } = await supabase
+            .from("compliance_reports")
+            .insert(batch);
 
-    if (error) {
-
-        console.error("Failed to save compliance reports:", error.message);
-        throw error;
-
+        if (error) {
+            console.error("Failed to save compliance reports batch:", error.message);
+            throw error;
+        }
     }
 
     console.log(

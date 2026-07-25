@@ -118,7 +118,6 @@ export async function saveReportsAgent(state) {
         enrichedTransactionCount: Array.isArray(state.enrichedTransactions) ? state.enrichedTransactions.length : 0,
         reportCount: Array.isArray(state.reports) ? state.reports.length : 0,
         ruleResults: state.ruleResults || [],
-        reports: state.reports || [],
         graphMetrics: finalMetrics
     };
 
