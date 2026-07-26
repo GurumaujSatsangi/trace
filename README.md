@@ -17,7 +17,9 @@ resolves conversational context into structured intents, entities, and
 filters, then selects the analytical tools required for the request.
 
 **Repository:** <https://github.com/GurumaujSatsangi/trace>
+
 **Deployed:** <https://trace.gurumaujsatsangi.in>
+
 **Video Demo:** <https://www.gurumaujsatsangi.in/trace/SUDO_SU_VIT_VELLORE.mp4>
 
 ------------------------------------------------------------------------
