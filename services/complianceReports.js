@@ -119,7 +119,7 @@ export async function saveComplianceReports(reports, graphState = {}) {
         const batch = payload.slice(i, i + BATCH_SIZE);
         const { error } = await supabase
             .from("compliance_reports")
-            .insert(batch);
+            .upsert(batch, { onConflict: "transaction_id" });
 
         if (error) {
             console.error("Failed to save compliance reports batch:", error.message);

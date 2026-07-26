@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,10 +20,14 @@
             --border-color: #383838;
         }
 
-        body, html {
-            margin: 0; padding: 0; height: 100vh;
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
             font-family: Söhne, "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, Cantarell, "Noto Sans", sans-serif;
-            background: var(--bg-main); color: var(--text-primary);
+            background: var(--bg-main);
+            color: var(--text-primary);
             overflow: hidden;
         }
 
@@ -31,17 +36,20 @@
             width: 8px;
             height: 8px;
         }
+
         ::-webkit-scrollbar-track {
             background: transparent;
         }
+
         ::-webkit-scrollbar-thumb {
             background: rgba(255, 255, 255, 0.2);
             border-radius: 999px;
         }
+
         ::-webkit-scrollbar-thumb:hover {
             background: rgba(255, 255, 255, 0.3);
         }
-        
+
         /* For Firefox */
         * {
             scrollbar-width: thin;
@@ -49,165 +57,559 @@
         }
 
         .app-container {
-            display: flex; height: 100vh;
+            display: flex;
+            height: 100vh;
         }
 
         /* Sidebar */
         .sidebar {
-            width: 260px; background: var(--bg-sidebar); color: var(--text-primary);
-            display: flex; flex-direction: column; padding: 16px 12px; box-sizing: border-box;
+            width: 260px;
+            background: var(--bg-sidebar);
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            padding: 16px 12px;
+            box-sizing: border-box;
         }
 
-        .sidebar-header { margin-bottom: 24px; padding: 0 8px; }
-        .sidebar-header h2 { font-size: 16px; font-weight: 600; margin: 0; color: var(--text-primary); }
+        .sidebar-header {
+            margin-bottom: 24px;
+            padding: 0 8px;
+        }
 
-        .sidebar-menu { display: flex; flex-direction: column; gap: 4px; }
-        
+        .sidebar-header h2 {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0;
+            color: var(--text-primary);
+        }
+
+        .sidebar-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
         .sidebar-item {
-            display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 8px;
-            background: transparent; color: var(--text-primary); border: none; cursor: pointer;
-            font-size: 14px; font-weight: 500; transition: background 0.2s; font-family: inherit;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 8px;
+            background: transparent;
+            color: var(--text-primary);
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.2s;
+            font-family: inherit;
             text-align: left;
         }
-        .sidebar-item:hover, .sidebar-item.active { background: var(--hover-bg); }
-        .sidebar-item svg { color: var(--text-primary); flex-shrink: 0; }
+
+        .sidebar-item:hover,
+        .sidebar-item.active {
+            background: var(--hover-bg);
+        }
+
+        .sidebar-item svg {
+            color: var(--text-primary);
+            flex-shrink: 0;
+        }
 
         .upload-status {
-            padding: 12px; border-radius: 8px; font-size: 13px; line-height: 1.4; margin-top: 10px;
-            background: var(--bg-input); border: 1px solid var(--border-color);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 1.4;
+            margin-top: 10px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
         }
-        .upload-status.success { color: #a7f3d0; border-color: #059669; }
-        .upload-status.error { color: #fecaca; border-color: #dc2626; }
-        .upload-status.processing { color: #bfdbfe; border-color: #2563eb; }
+
+        .upload-status.success {
+            color: #a7f3d0;
+            border-color: #059669;
+        }
+
+        .upload-status.error {
+            color: #fecaca;
+            border-color: #dc2626;
+        }
+
+        .upload-status.processing {
+            color: #bfdbfe;
+            border-color: #2563eb;
+        }
 
         /* Main Chat Area */
         .chat-container {
-            flex: 1; display: flex; flex-direction: column; background: var(--bg-main); position: relative;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-main);
+            position: relative;
         }
 
         .chat-history {
-            flex: 1; overflow-y: auto; padding: 40px 20px 0; display: flex; flex-direction: column; gap: 24px;
-            scroll-behavior: smooth; position: relative; align-items: center;
+            flex: 1;
+            overflow-y: auto;
+            padding: 40px 20px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            scroll-behavior: smooth;
+            position: relative;
+            align-items: center;
         }
 
         .empty-state {
-            position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%);
-            text-align: center; display: flex;
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            display: flex;
         }
-        .empty-state h2 { font-size: 28px; font-weight: 600; margin: 0; color: var(--text-primary); letter-spacing: -0.5px; }
+
+        .empty-state h2 {
+            font-size: 28px;
+            font-weight: 600;
+            margin: 0;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+        }
 
         .message {
-            display: flex; gap: 16px; width: 100%; max-width: 800px; padding: 0 12px; box-sizing: border-box;
+            display: flex;
+            gap: 16px;
+            width: 100%;
+            max-width: 800px;
+            padding: 0 12px;
+            box-sizing: border-box;
         }
 
-        .message.user { justify-content: flex-end; }
-        .message.ai { justify-content: flex-start; }
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message.ai {
+            justify-content: flex-start;
+        }
 
         .avatar {
-            width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-weight: 600; font-size: 12px; flex-shrink: 0; color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 12px;
+            flex-shrink: 0;
+            color: white;
         }
-        .message.ai .avatar { background: #10a37f; } /* ChatGPT icon color */
-        .message.ai .avatar svg { width: 18px; height: 18px; }
-        .message.user .avatar { display: none; }
+
+        .message.ai .avatar {
+            background: #10a37f;
+        }
+
+        /* ChatGPT icon color */
+        .message.ai .avatar svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .message.user .avatar {
+            display: none;
+        }
 
         .message-content {
-            font-size: 16px; line-height: 1.6; max-width: 80%; overflow-x: auto;
+            font-size: 16px;
+            line-height: 1.6;
+            max-width: 80%;
+            overflow-x: auto;
         }
 
         .message.user .message-content {
-            background: var(--bg-input); padding: 12px 18px; border-radius: 20px;
-            color: var(--text-primary); word-break: break-word;
+            background: var(--bg-input);
+            padding: 12px 18px;
+            border-radius: 20px;
+            color: var(--text-primary);
+            word-break: break-word;
         }
 
         .message.ai .message-content {
-            color: var(--text-primary); width: 100%; max-width: 100%;
+            color: var(--text-primary);
+            width: 100%;
+            max-width: 100%;
         }
 
         /* AI Message Rich Content Elements */
-        .verdict-box { background: var(--bg-sidebar); border: 1px solid var(--border-color); padding: 16px; border-radius: 8px; margin-bottom: 16px; color: var(--text-primary); font-size: 14.5px; overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 16px; background: transparent; }
-        th, td { border: 1px solid var(--border-color); padding: 10px 14px; text-align: left; }
-        th { background: #2a2a2a; font-weight: 600; color: var(--text-primary); }
-        .table-responsive { overflow-x: auto; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 16px; }
-        .sql-pre { background: #000000; color: #e2e8f0; padding: 12px 16px; border-radius: 8px; font-size: 13px; overflow-x: auto; margin: 0; }
+        .verdict-box {
+            background: var(--bg-sidebar);
+            border: 1px solid var(--border-color);
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+            font-size: 14.5px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin-bottom: 16px;
+            background: transparent;
+        }
+
+        th,
+        td {
+            border: 1px solid var(--border-color);
+            padding: 10px 14px;
+            text-align: left;
+        }
+
+        th {
+            background: #2a2a2a;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 16px;
+        }
+
+        .sql-pre {
+            background: #000000;
+            color: #e2e8f0;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            overflow-x: auto;
+            margin: 0;
+        }
 
         /* Input Area */
         .input-area {
-            padding: 20px 40px; width: 100%; max-width: 800px; margin: 0 auto; box-sizing: border-box;
-            background: linear-gradient(0deg, var(--bg-main) 70%, rgba(33,33,33,0));
+            padding: 20px 40px;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            box-sizing: border-box;
+            background: linear-gradient(0deg, var(--bg-main) 70%, rgba(33, 33, 33, 0));
         }
 
         .input-area form {
-            position: relative; display: flex; gap: 12px; align-items: flex-end;
-            background: var(--bg-input); border: 1px solid transparent;
-            border-radius: 24px; padding: 8px 12px;
+            position: relative;
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+            background: var(--bg-input);
+            border: 1px solid transparent;
+            border-radius: 24px;
+            padding: 8px 12px;
         }
-        .input-area form:focus-within { border-color: #555; }
+
+        .input-area form:focus-within {
+            border-color: #555;
+        }
 
         .btn-attach {
-            height: 36px; width: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            background: transparent; color: var(--text-primary); border: none; cursor: pointer; flex-shrink: 0; margin-bottom: 2px;
+            height: 36px;
+            width: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            color: var(--text-primary);
+            border: none;
+            cursor: pointer;
+            flex-shrink: 0;
+            margin-bottom: 2px;
         }
-        .btn-attach:hover { background: #404040; }
+
+        .btn-attach:hover {
+            background: #404040;
+        }
 
         .input-area textarea {
-            flex: 1; min-height: 24px; max-height: 200px; padding: 10px 0; border: none; resize: none; font-size: 16px;
-            line-height: 1.5; font-family: inherit; background: transparent; color: var(--text-primary); outline: none;
+            flex: 1;
+            min-height: 24px;
+            max-height: 200px;
+            padding: 10px 0;
+            border: none;
+            resize: none;
+            font-size: 16px;
+            line-height: 1.5;
+            font-family: inherit;
+            background: transparent;
+            color: var(--text-primary);
+            outline: none;
         }
-        .input-area textarea::placeholder { color: #8e8e8e; }
+
+        .input-area textarea::placeholder {
+            color: #8e8e8e;
+        }
 
         .input-area #chatBtn {
-            height: 36px; width: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            background: #ececec; color: #212121; border: none; cursor: pointer; transition: 0.2s; flex-shrink: 0; margin-bottom: 2px;
+            height: 36px;
+            width: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #ececec;
+            color: #212121;
+            border: none;
+            cursor: pointer;
+            transition: 0.2s;
+            flex-shrink: 0;
+            margin-bottom: 2px;
         }
-        .input-area #chatBtn:hover { background: #ffffff; }
-        .input-area #chatBtn:disabled { background: #404040; color: #8e8e8e; cursor: not-allowed; }
 
-        .disclaimer { text-align: center; font-size: 12px; color: var(--text-secondary); margin-top: 12px; }
+        .input-area #chatBtn:hover {
+            background: #ffffff;
+        }
+
+        .input-area #chatBtn:disabled {
+            background: #404040;
+            color: #8e8e8e;
+            cursor: not-allowed;
+        }
+
+        .disclaimer {
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 12px;
+        }
 
         /* Loading Spinner */
-        .loading-badge { display: inline-flex; align-items: center; gap: 10px; font-size: 14px; color: var(--text-secondary); font-weight: 500; }
-        .spinner-small { width: 14px; height: 14px; border: 2px solid var(--text-secondary); border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .spinner-small {
+            width: 14px;
+            height: 14px;
+            border: 2px solid var(--text-secondary);
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
 
         /* Tabular View & Modals */
-        #tabularView { flex: 1; padding: 40px; overflow-y: auto; display: none; background: var(--bg-main); }
-        #tabularView h2 { margin-top: 0; margin-bottom: 24px; color: var(--text-primary); }
-        .reports-table { width: 100%; border-collapse: collapse; background: var(--bg-sidebar); border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; font-size: 14px; color: var(--text-primary); }
-        .reports-table th, .reports-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border-color); }
-        .reports-table th { background: #2f2f2f; font-weight: 600; color: var(--text-primary); }
-        .reports-table tr:last-child td { border-bottom: none; }
-        .reports-table tr:hover { background: #2a2a2a; }
-        .reports-table a { color: #60a5fa; text-decoration: none; cursor: pointer; font-weight: 500; }
-        .reports-table a:hover { text-decoration: underline; }
-        .btn-view-details { background: #ffffff; color: #000000; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; transition: 0.2s; }
-        .btn-view-details:hover { background: #d4d4d4; }
-
-        #searchInput, #riskFilter {
-            background: var(--bg-input); color: var(--text-primary); border: 1px solid var(--border-color); padding: 10px; border-radius: 8px; font-size: 14px; outline: none;
+        #tabularView {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+            display: none;
+            background: var(--bg-main);
         }
-        #searchInput:focus, #riskFilter:focus { border-color: #555; }
-        #searchInput::placeholder { color: var(--text-secondary); }
 
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); display: none; justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: var(--bg-main); color: var(--text-primary); width: 85%; max-width: 900px; max-height: 85vh; border-radius: 20px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8); border: 1px solid var(--border-color); }
-        .modal-header { padding: 24px 24px 16px; display: flex; justify-content: space-between; align-items: center; background: transparent; border-bottom: none; }
-        .modal-header h3 { margin: 0; color: var(--text-primary); font-size: 20px; font-weight: 600; letter-spacing: -0.02em; }
-        .close-modal { background: none; border: none; font-size: 28px; cursor: pointer; color: var(--text-secondary); line-height: 1; padding: 0; transition: color 0.2s; }
-        .close-modal:hover { color: var(--text-primary); }
-        .modal-body { padding: 0 24px 24px; overflow-y: auto; flex: 1; }
-        .json-pre { background: #000000; color: #e2e8f0; padding: 16px; border-radius: 8px; overflow-x: auto; margin: 0; font-size: 13.5px; line-height: 1.5; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
-        
+        #tabularView h2 {
+            margin-top: 0;
+            margin-bottom: 24px;
+            color: var(--text-primary);
+        }
+
+        .reports-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg-sidebar);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        .reports-table th,
+        .reports-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .reports-table th {
+            background: #2f2f2f;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .reports-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .reports-table tr:hover {
+            background: #2a2a2a;
+        }
+
+        .reports-table a {
+            color: #60a5fa;
+            text-decoration: none;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .reports-table a:hover {
+            text-decoration: underline;
+        }
+
+        .btn-view-details {
+            background: #ffffff;
+            color: #000000;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+
+        .btn-view-details:hover {
+            background: #d4d4d4;
+        }
+
+        #searchInput,
+        #riskFilter {
+            background: var(--bg-input);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        #searchInput:focus,
+        #riskFilter:focus {
+            border-color: #555;
+        }
+
+        #searchInput::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: var(--bg-main);
+            color: var(--text-primary);
+            width: 85%;
+            max-width: 900px;
+            max-height: 85vh;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--border-color);
+        }
+
+        .modal-header {
+            padding: 24px 24px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: transparent;
+            border-bottom: none;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            color: var(--text-primary);
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            line-height: 1;
+            padding: 0;
+            transition: color 0.2s;
+        }
+
+        .close-modal:hover {
+            color: var(--text-primary);
+        }
+
+        .modal-body {
+            padding: 0 24px 24px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .json-pre {
+            background: #000000;
+            color: #e2e8f0;
+            padding: 16px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 0;
+            font-size: 13.5px;
+            line-height: 1.5;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        }
+
         /* Utility */
-        .hidden { display: none !important; }
-        
+        .hidden {
+            display: none !important;
+        }
+
         /* Voice Recording Animation */
         @keyframes pulse-red {
-            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.1); }
-            70% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); background: rgba(239, 68, 68, 0.1); }
-            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); background: transparent; }
+            0% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+                background: rgba(239, 68, 68, 0.1);
+            }
+
+            70% {
+                box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
+                background: rgba(239, 68, 68, 0.1);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+                background: transparent;
+            }
         }
+
         #voiceBtn.recording {
             color: #ef4444;
             animation: pulse-red 1.5s infinite;
@@ -215,31 +617,61 @@
         }
     </style>
 </head>
+
 <body>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <div class="app-container">
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header">
                 <h2>TRACE</h2>
             </div>
-            
+
             <div class="sidebar-menu">
+                <button type="button" id="newChatBtn" class="sidebar-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    New chat
+                </button>
                 <button type="button" id="addDatasetBtn" class="sidebar-item">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
                     Add dataset
                 </button>
                 <button type="button" id="chatViewBtn" class="sidebar-item active">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
                     Chat view
                 </button>
                 <button type="button" id="tabViewBtn" class="sidebar-item">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
                     Tabular view
                 </button>
             </div>
-            
-            <div style="flex: 1;"></div>
-            
+
+            <div class="sidebar-header" style="margin-top: 1rem;">
+                <h3
+                    style="font-size: 0.75rem; text-transform: uppercase; color: #64748b; letter-spacing: 0.05em; font-weight: 600;">
+                    Recent Conversations</h3>
+            </div>
+            <div class="sidebar-menu" id="conversationList" style="flex: 1; overflow-y: auto;">
+                <!-- Conversation items injected here -->
+            </div>
+
             <!-- Hidden Upload Form -->
             <form id="uploadForm" class="hidden">
                 <input type="file" name="csvFile" id="csvFile" accept=".csv" required>
@@ -259,11 +691,18 @@
             <div class="input-area">
                 <form id="chatForm">
                     <button type="button" class="btn-attach" onclick="document.getElementById('addDatasetBtn').click()">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
                     </button>
-                    <textarea name="message" id="messageInput" placeholder="Ask anything" required rows="1" oninput="this.style.height = ''; this.style.height = Math.min(this.scrollHeight, 200) + 'px'"></textarea>
-                    <button type="button" id="voiceBtn" class="btn-attach" title="Search with Voice" style="display: none;">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <textarea name="message" id="messageInput" placeholder="Ask anything" required rows="1"
+                        oninput="this.style.height = ''; this.style.height = Math.min(this.scrollHeight, 200) + 'px'"></textarea>
+                    <button type="button" id="voiceBtn" class="btn-attach" title="Search with Voice"
+                        style="display: none;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path>
                             <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
                             <line x1="12" y1="19" x2="12" y2="23"></line>
@@ -271,7 +710,11 @@
                         </svg>
                     </button>
                     <button type="submit" id="chatBtn">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="19" x2="12" y2="5"></line>
+                            <polyline points="5 12 12 5 19 12"></polyline>
+                        </svg>
                     </button>
                 </form>
                 <div class="disclaimer">TRACE can make mistakes. Verify important information.</div>
@@ -287,15 +730,22 @@
 
             <!-- Filter and Search Area -->
             <div style="display: flex; gap: 12px; margin-bottom: 16px; align-items: center;">
-                <input type="text" id="searchInput" placeholder="Search by Account ID, Transaction ID, or Customer Name..." style="flex: 1;">
+                <input type="text" id="searchInput"
+                    placeholder="Search by Account ID, Transaction ID, or Customer Name..." style="flex: 1;">
                 <select id="riskFilter">
                     <option value="ALL">All Risk Levels</option>
                     <option value="HIGH">High Risk</option>
                     <option value="MEDIUM">Medium Risk</option>
                     <option value="LOW">Low Risk</option>
                 </select>
-                <button id="exportBriefBtn" class="btn-view-details" style="background: #ffffff; color: #000; display: flex; align-items: center; gap: 6px; padding: 10px 16px;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                <button id="exportBriefBtn" class="btn-view-details"
+                    style="background: #ffffff; color: #000; display: flex; align-items: center; gap: 6px; padding: 10px 16px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
                     Export PDF Brief
                 </button>
             </div>
@@ -313,7 +763,10 @@
                         </tr>
                     </thead>
                     <tbody id="reportsTableBody">
-                        <tr><td colspan="6" style="text-align: center; color: var(--text-secondary);">No data loaded.</td></tr>
+                        <tr>
+                            <td colspan="6" style="text-align: center; color: var(--text-secondary);">No data loaded.
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -346,30 +799,163 @@
     </div>
 
     <script>
-        const chatHistory = document.getElementById('chatHistory');
+        // --- Multi-Conversation localStorage ---
+        const STORAGE_KEY_V1 = "traceConversationsV1";
+        const OLD_STORAGE_KEY = "traceChatHistory"; // For migration
+
+        // Generate a simple UUID fallback if crypto.randomUUID is unavailable
+        function generateUUID() {
+            if (window.crypto && window.crypto.randomUUID) {
+                return window.crypto.randomUUID();
+            }
+            return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+                (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+            );
+        }
+
+        // Initialize state
+        let conversationState = {
+            activeConversationId: null,
+            conversations: []
+        };
+
+        function loadConversations() {
+            try {
+                // 1. One-time migration from old key
+                const oldData = localStorage.getItem(OLD_STORAGE_KEY);
+                if (oldData) {
+                    try {
+                        const parsedOld = JSON.parse(oldData);
+                        if (Array.isArray(parsedOld) && parsedOld.length > 0) {
+                            const newId = generateUUID();
+                            const migratedConv = {
+                                id: newId,
+                                title: parsedOld[0].content.substring(0, 30) + (parsedOld[0].content.length > 30 ? "..." : ""),
+                                createdAt: new Date().toISOString(),
+                                updatedAt: new Date().toISOString(),
+                                messages: parsedOld
+                            };
+                            conversationState = {
+                                activeConversationId: newId,
+                                conversations: [migratedConv]
+                            };
+                            saveConversations();
+                            localStorage.removeItem(OLD_STORAGE_KEY);
+                            return;
+                        }
+                    } catch (e) {
+                        console.error("Migration failed:", e);
+                    }
+                    localStorage.removeItem(OLD_STORAGE_KEY);
+                }
+
+                // 2. Load V1 format
+                const data = localStorage.getItem(STORAGE_KEY_V1);
+                if (data) {
+                    const parsed = JSON.parse(data);
+                    if (parsed && Array.isArray(parsed.conversations)) {
+                        conversationState = parsed;
+
+                        // Ensure there's an active conversation (or create one)
+                        if (!conversationState.activeConversationId ||
+                            !conversationState.conversations.find(c => c.id === conversationState.activeConversationId)) {
+                            createNewConversation();
+                        }
+                        return;
+                    }
+                }
+            } catch (err) {
+                console.error("Error loading conversations:", err);
+            }
+
+            // Fallback: create fresh state
+            conversationState = { activeConversationId: null, conversations: [] };
+            createNewConversation();
+        }
+
+        function saveConversations() {
+            try {
+                localStorage.setItem(STORAGE_KEY_V1, JSON.stringify(conversationState));
+                renderConversationList();
+            } catch (err) {
+                console.error("Error saving conversations:", err);
+            }
+        }
+
+        function getActiveConversation() {
+            return conversationState.conversations.find(c => c.id === conversationState.activeConversationId);
+        }
+
+        function createNewConversation() {
+            // Re-use current if it's already empty
+            const active = getActiveConversation();
+            if (active && active.messages.length === 0) return active;
+
+            const newId = generateUUID();
+            const newConv = {
+                id: newId,
+                title: "New Conversation",
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+                messages: []
+            };
+
+            // Limit to 20 conversations total
+            if (conversationState.conversations.length >= 20) {
+                // Remove oldest
+                conversationState.conversations.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+                conversationState.conversations.pop();
+            }
+
+            conversationState.conversations.unshift(newConv);
+            conversationState.activeConversationId = newId;
+            saveConversations();
+            return newConv;
+        }
+
+        // --- DOM references ---
+        const chatHistoryEl = document.getElementById('chatHistory');
         const uploadForm = document.getElementById('uploadForm');
         const chatForm = document.getElementById('chatForm');
         const csvFile = document.getElementById('csvFile');
         const addDatasetBtn = document.getElementById('addDatasetBtn');
         const emptyState = document.getElementById('emptyState');
-        
+        const conversationListEl = document.getElementById('conversationList');
+
         function scrollToBottom() {
-            chatHistory.scrollTop = chatHistory.scrollHeight;
+            chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
+        }
+
+        function syncEmptyState() {
+            if (!emptyState) return;
+
+            // Check if we are physically showing any messages
+            const hasMessages = Array.from(chatHistoryEl.children).some(
+                el => el.classList.contains('message')
+            );
+
+            if (hasMessages) {
+                emptyState.classList.add('hidden');
+            } else {
+                emptyState.classList.remove('hidden');
+            }
+
+            // Ensure emptyState stays in DOM as the first child or behind messages
+            // (it is styled with position absolute, so order matters less, but we keep it)
         }
 
         function appendUserMessage(text) {
-            if (emptyState) emptyState.classList.add('hidden');
             const msg = document.createElement('div');
             msg.className = 'message user';
             msg.innerHTML = `
                 <div class="message-content">${text.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>
             `;
-            chatHistory.appendChild(msg);
+            chatHistoryEl.appendChild(msg);
+            syncEmptyState();
             scrollToBottom();
         }
 
         function appendAiMessage(htmlContent) {
-            if (emptyState) emptyState.classList.add('hidden');
             const msg = document.createElement('div');
             msg.className = 'message ai';
             msg.innerHTML = `
@@ -378,10 +964,84 @@
                 </div>
                 <div class="message-content" style="width: 100%; max-width: 100%;">${htmlContent}</div>
             `;
-            chatHistory.appendChild(msg);
+            chatHistoryEl.appendChild(msg);
+            syncEmptyState();
             scrollToBottom();
             return msg;
         }
+
+        function renderConversationList() {
+            if (!conversationListEl) return;
+
+            conversationListEl.innerHTML = '';
+
+            // Sort by recently updated
+            const sorted = [...conversationState.conversations].sort((a, b) =>
+                new Date(b.updatedAt) - new Date(a.updatedAt)
+            );
+
+            sorted.forEach(conv => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'sidebar-item' + (conv.id === conversationState.activeConversationId ? ' active' : '');
+
+                // SVG icon for chat
+                const icon = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>`;
+
+                btn.innerHTML = `${icon} <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px;">${conv.title.replace(/</g, "&lt;")}</span>`;
+
+                btn.addEventListener('click', () => {
+                    switchConversation(conv.id);
+                });
+
+                conversationListEl.appendChild(btn);
+            });
+        }
+
+        function switchConversation(id) {
+            if (conversationState.activeConversationId === id) return;
+
+            conversationState.activeConversationId = id;
+            saveConversations();
+
+            renderActiveConversation();
+        }
+
+        // --- Restore persisted messages for active chat ---
+        function renderActiveConversation() {
+            // Remove existing messages
+            const messages = Array.from(chatHistoryEl.querySelectorAll('.message'));
+            messages.forEach(m => m.remove());
+
+            const active = getActiveConversation();
+            if (!active) {
+                syncEmptyState();
+                return;
+            }
+
+            for (const entry of active.messages) {
+                if (entry.role === "user") {
+                    appendUserMessage(entry.content);
+                } else if (entry.role === "assistant") {
+                    // Render as verdict-box to match live rendering style
+                    const safeContent = entry.content.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, '<br>');
+                    appendAiMessage(`<div class="verdict-box">${safeContent}</div>`);
+                }
+            }
+
+            syncEmptyState();
+            scrollToBottom();
+        }
+
+        // Setup on load
+        loadConversations();
+        renderActiveConversation();
+
+        // --- New Chat button ---
+        document.getElementById('newChatBtn').addEventListener('click', () => {
+            createNewConversation();
+            renderActiveConversation();
+        });
 
         // Handle Add Dataset Click
         addDatasetBtn.addEventListener('click', () => {
@@ -413,7 +1073,7 @@
                     body: formData
                 });
                 const result = await response.json();
-                
+
                 if (response.ok) {
                     statusEl.textContent = `✓ ${result.message}`;
                     statusEl.className = "upload-status success";
@@ -443,6 +1103,22 @@
             messageInput.style.height = '';
             submitBtn.disabled = true;
 
+            const activeConv = getActiveConversation();
+            if (!activeConv) return;
+
+            // Set title if first message
+            if (activeConv.messages.length === 0) {
+                activeConv.title = message.substring(0, 30) + (message.length > 30 ? "..." : "");
+            }
+
+            // Append user message to history BEFORE sending
+            activeConv.messages.push({ role: "user", content: message });
+            activeConv.updatedAt = new Date().toISOString();
+            saveConversations();
+
+            // Build bounded recent history (EXCLUDING the current message we just appended, max 10 pairs)
+            const recentHistory = activeConv.messages.slice(0, -1).slice(-20);
+
             // Show Loading Indicator in Chat
             const loader = appendAiMessage(`
                 <div class="loading-badge" id="activeLoader">
@@ -455,18 +1131,20 @@
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message })
+                    body: JSON.stringify({ message, history: recentHistory })
                 });
                 const result = await response.json();
 
                 // Remove loader
                 loader.remove();
 
-                if (result.success && result.results) {
+                if (result.success && (result.results || result.complianceVerdict)) {
                     let aiHtml = '';
+                    let verdictText = '';
 
                     // Verdict
                     if (result.complianceVerdict) {
+                        verdictText = result.complianceVerdict;
                         let formattedVerdict = result.complianceVerdict.split(/(<(?:table|ul|ol)[\s\S]*?<\/(?:table|ul|ol)>)/i);
                         for (let i = 0; i < formattedVerdict.length; i++) {
                             if (!/^<(?:table|ul|ol)/i.test(formattedVerdict[i])) {
@@ -476,33 +1154,49 @@
                         aiHtml += `<div class="verdict-box">${formattedVerdict.join('')}</div>`;
                     }
 
-                    const highRiskTxns = result.results.filter(r => r.risk_level && r.risk_level.toUpperCase() === 'HIGH');
-                    if (highRiskTxns.length > 0) {
-                        const txnData = encodeURIComponent(JSON.stringify(highRiskTxns[0])).replace(/'/g, '%27');
-                        const verdictData = encodeURIComponent(result.complianceVerdict || "").replace(/'/g, '%27');
-                        aiHtml += `<button style="margin-top: 10px; background-color: #dc2626; color: white; font-weight: bold; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 6px;" onclick="downloadSAR('${txnData}', '${verdictData}')">
-                                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                                      Download SAR
-                                   </button>`;
+                    if (result.results && Array.isArray(result.results)) {
+                        const highRiskTxns = result.results.filter(r => r.risk_level && r.risk_level.toUpperCase() === 'HIGH');
+                        if (highRiskTxns.length > 0) {
+                            const txnData = encodeURIComponent(JSON.stringify(highRiskTxns[0])).replace(/'/g, '%27');
+                            const verdictData = encodeURIComponent(result.complianceVerdict || "").replace(/'/g, '%27');
+                            aiHtml += `<button style="margin-top: 10px; background-color: #dc2626; color: white; font-weight: bold; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 6px;" onclick="downloadSAR('${txnData}', '${verdictData}')">
+                                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                          Download SAR
+                                       </button>`;
+                        }
                     }
 
                     appendAiMessage(aiHtml);
+
+                    // Persist assistant turn (text only, no HTML/tables/buttons)
+                    if (verdictText) {
+                        // Strip HTML tags for clean text storage
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = verdictText;
+                        const cleanText = tempDiv.textContent || tempDiv.innerText || verdictText;
+
+                        const activeConv = getActiveConversation();
+                        if (activeConv) {
+                            activeConv.messages.push({ role: "assistant", content: cleanText });
+                            activeConv.updatedAt = new Date().toISOString();
+                            saveConversations();
+                        }
+                    }
                 } else if (result.error === "RATE_LIMIT" || response.status === 429) {
                     const waitTime = result.retryAfter || 15;
                     const msgId = 'countdown-' + Date.now();
                     appendAiMessage(`<div style="color: #ea580c; font-weight: 500; font-size: 14.5px;">Rate limit reached. Please wait <span id="${msgId}">${waitTime}</span> seconds before sending another message.</div>`);
-                    
+
                     submitBtn.setAttribute('data-rate-limited', 'true');
                     submitBtn.disabled = true;
                     messageInput.disabled = true;
-                    
+
                     let timeLeft = waitTime;
                     const interval = setInterval(() => {
                         timeLeft -= 1;
                         const counterEl = document.getElementById(msgId);
-                        if (counterEl) {
-                            counterEl.textContent = Math.max(0, timeLeft);
-                        }
+                        if (counterEl) counterEl.textContent = timeLeft;
+
                         if (timeLeft <= 0) {
                             clearInterval(interval);
                             submitBtn.removeAttribute('data-rate-limited');
@@ -511,18 +1205,6 @@
                             messageInput.focus();
                         }
                     }, 1000);
-                } else if (result.error === "SQL_ERROR") {
-                    let errorMessage = result.details || "The query generated was invalid.";
-                    appendAiMessage(`
-                        <div style="color: #f87171; font-weight: 500; font-size: 14.5px; margin-bottom: 8px;">
-                            Oops, I had trouble understanding or querying the database.
-                        </div>
-                        <div style="font-size: 13.5px; color: #fca5a5; background: rgba(220, 38, 38, 0.2); padding: 12px; border-radius: 6px; border: 1px solid #7f1d1d;">
-                            <strong>Error Details:</strong><br>
-                            ${String(errorMessage).replace(/</g, '&lt;')}
-                        </div>
-                    `);
-                } else {
                     appendAiMessage(`<div style="color: #f87171; font-weight: 500;">Error:</div><pre class="sql-pre">${JSON.stringify(result, null, 2)}</pre>`);
                 }
             } catch (err) {
@@ -537,7 +1219,7 @@
         });
 
         // Submit on Enter (Shift+Enter for newline)
-        document.getElementById('messageInput').addEventListener('keydown', function(e) {
+        document.getElementById('messageInput').addEventListener('keydown', function (e) {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
                 chatForm.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
@@ -558,9 +1240,124 @@
             tabViewBtn.classList.remove('active');
         });
 
-        tabViewBtn.addEventListener('click', () => {
+        tabViewBtn.addEventListener('click', async () => {
             chatView.style.display = 'none';
             tabularView.style.display = 'block';
+
+            // Render Tabular View Charts
+            const chartContainer = document.getElementById('chartContainer');
+            if (chartContainer) {
+                // If it already exists and has charts, we could choose to reuse it, but we'll recreate to ensure freshness
+                chartContainer.remove();
+            }
+
+            const headerEl = tabularView.querySelector('h2');
+            const newChartContainer = document.createElement('div');
+            newChartContainer.id = 'chartContainer';
+            newChartContainer.style.cssText = 'display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; padding: 20px; border-bottom: 1px solid #334155;';
+            headerEl.parentNode.insertBefore(newChartContainer, headerEl.nextSibling);
+
+            try {
+                const response = await fetch('/api/analytics/summary');
+                const result = await response.json();
+
+                if (result.success && result.availableMetrics && result.availableMetrics.length > 0) {
+
+                    // Risk Distribution Doughnut Chart
+                    if (result.availableMetrics.includes('riskDistribution')) {
+                        const wrapper = document.createElement('div');
+                        wrapper.style.cssText = 'background: #1e293b; padding: 15px; border-radius: 8px; border: 1px solid #334155;';
+                        wrapper.innerHTML = '<h3 style="margin-top: 0; margin-bottom: 15px; font-size: 14px; color: #e2e8f0; text-align: center;">Risk Distribution</h3><canvas id="riskChart"></canvas>';
+                        newChartContainer.appendChild(wrapper);
+
+                        const ctx = document.getElementById('riskChart').getContext('2d');
+                        new Chart(ctx, {
+                            type: 'doughnut',
+                            data: {
+                                labels: Object.keys(result.riskDistribution || {}),
+                                datasets: [{
+                                    data: Object.values(result.riskDistribution || {}),
+                                    backgroundColor: ['#ef4444', '#f59e0b', '#3b82f6', '#10b981'],
+                                    borderColor: '#1e293b',
+                                    borderWidth: 2
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                plugins: { legend: { position: 'bottom', labels: { color: '#cbd5e1' } } },
+                                cutout: '70%'
+                            }
+                        });
+                    }
+
+                    // Transactions Over Time Line Chart
+                    if (result.availableMetrics.includes('transactionsPerDay')) {
+                        const wrapper = document.createElement('div');
+                        wrapper.style.cssText = 'background: #1e293b; padding: 15px; border-radius: 8px; border: 1px solid #334155;';
+                        wrapper.innerHTML = '<h3 style="margin-top: 0; margin-bottom: 15px; font-size: 14px; color: #e2e8f0; text-align: center;">Transactions Over Time</h3><canvas id="timelineChart"></canvas>';
+                        newChartContainer.appendChild(wrapper);
+
+                        const ctx = document.getElementById('timelineChart').getContext('2d');
+                        new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels: (result.transactionsPerDay || []).map(d => d.day),
+                                datasets: [{
+                                    label: 'Transaction Count',
+                                    data: (result.transactionsPerDay || []).map(d => d.count),
+                                    borderColor: '#6366f1',
+                                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                                    tension: 0.3,
+                                    fill: true
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                plugins: { legend: { display: false } },
+                                scales: {
+                                    x: { grid: { color: '#334155' }, ticks: { color: '#cbd5e1' } },
+                                    y: { grid: { color: '#334155' }, ticks: { color: '#cbd5e1' } }
+                                }
+                            }
+                        });
+                    }
+
+                    // Transaction Type Bar Chart
+                    if (result.availableMetrics.includes('typeDistribution')) {
+                        const wrapper = document.createElement('div');
+                        wrapper.style.cssText = 'background: #1e293b; padding: 15px; border-radius: 8px; border: 1px solid #334155;';
+                        wrapper.innerHTML = '<h3 style="margin-top: 0; margin-bottom: 15px; font-size: 14px; color: #e2e8f0; text-align: center;">Transaction Types</h3><canvas id="typeChart"></canvas>';
+                        newChartContainer.appendChild(wrapper);
+
+                        const ctx = document.getElementById('typeChart').getContext('2d');
+                        new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: Object.keys(result.typeDistribution || {}),
+                                datasets: [{
+                                    label: 'Volume',
+                                    data: Object.values(result.typeDistribution || {}),
+                                    backgroundColor: '#8b5cf6',
+                                    borderRadius: 4
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                plugins: { legend: { display: false } },
+                                scales: {
+                                    x: { grid: { display: false }, ticks: { color: '#cbd5e1' } },
+                                    y: { grid: { color: '#334155' }, ticks: { color: '#cbd5e1' } }
+                                }
+                            }
+                        });
+                    }
+                } else {
+                    newChartContainer.style.display = 'none';
+                }
+            } catch (err) {
+                console.error("Failed to load tabular charts:", err);
+                newChartContainer.style.display = 'none';
+            }
             chatViewBtn.classList.remove('active');
             tabViewBtn.classList.add('active');
             loadReports();
@@ -594,15 +1391,11 @@
             const risk = riskFilter.value;
 
             const filtered = reportsCache.filter(row => {
-                const reportData = row.report || row;
-                const tx = reportData.transaction || {};
-                const qa = reportData.qa || {};
-                
-                const accountId = (row.account_id || tx.account_id || '').toLowerCase();
-                const txId = (row.transaction_id || tx.transaction_id || qa.transaction_id || '').toLowerCase();
-                const name = (row.customer_name || tx.customer_name || '').toLowerCase();
-                
-                const riskLevel = (row.risk_level || qa.risk_level || 'N/A').toUpperCase();
+                const accountId = (row.account_id || '').toLowerCase();
+                const txId = (row.transaction_id || '').toLowerCase();
+                const name = (row.customer_name || '').toLowerCase();
+
+                const riskLevel = (row.risk_level || 'N/A').toUpperCase();
 
                 const matchesSearch = accountId.includes(term) || txId.includes(term) || name.includes(term);
                 const matchesRisk = risk === 'ALL' || riskLevel === risk;
@@ -616,9 +1409,7 @@
         function updateStats(reports) {
             let high = 0, medium = 0, low = 0;
             reports.forEach(row => {
-                const reportData = row.report || row;
-                const qa = reportData.qa || {};
-                const riskLevel = (row.risk_level || qa.risk_level || 'N/A').toUpperCase();
+                const riskLevel = (row.risk_level || 'N/A').toUpperCase();
                 if (riskLevel === 'HIGH') high++;
                 else if (riskLevel === 'MEDIUM') medium++;
                 else if (riskLevel === 'LOW') low++;
@@ -649,7 +1440,7 @@
         function renderReportsTable(reports) {
             const tbody = document.getElementById('reportsTableBody');
             tbody.innerHTML = '';
-            
+
             if (reports.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 24px; color: var(--text-secondary);">No matching compliance reports found.</td></tr>';
                 return;
@@ -657,22 +1448,15 @@
 
             reports.forEach((row) => {
                 const index = reportsCache.indexOf(row);
-                const reportData = row.report || row; 
-                const qa = reportData.qa || {};
-                const tx = reportData.transaction || {};
-                
-                const accountId = row.account_id || tx.account_id || 'N/A';
-                const txId = row.transaction_id || tx.transaction_id || qa.transaction_id || 'N/A';
-                
-                let riskScore = 'N/A';
-                if (row.risk_score !== undefined && row.risk_score !== null) riskScore = row.risk_score;
-                else if (qa.risk_score !== undefined && qa.risk_score !== null) riskScore = qa.risk_score;
 
-                const riskLevel = row.risk_level || qa.risk_level || 'N/A';
+                const accountId = row.account_id || 'N/A';
+                const txId = row.transaction_id || 'N/A';
+                let riskScore = row.risk_score !== undefined && row.risk_score !== null ? row.risk_score : 'N/A';
+                const riskLevel = row.risk_level || 'N/A';
                 const riskColor = riskLevel === 'HIGH' ? '#f87171' : (riskLevel === 'MEDIUM' ? '#fbbf24' : '#4ade80');
 
                 let flagsHtml = '-';
-                const flagsArr = row.flags || qa.flags || [];
+                const flagsArr = row.flags || [];
                 if (Array.isArray(flagsArr) && flagsArr.length > 0) {
                     flagsHtml = '<div style="display: flex; gap: 4px; flex-wrap: wrap;">';
                     flagsArr.forEach(flag => {
@@ -689,7 +1473,7 @@
                             });
                             flagsHtml += '</div>';
                         }
-                    } catch(e) {}
+                    } catch (e) { }
                 }
 
                 const tr = document.createElement('tr');
@@ -707,18 +1491,18 @@
 
         function createTableFromJSON(obj, depth = 0) {
             if (obj === null || obj === undefined) return '';
-            
+
             let tableStyle = depth === 0 ? 'width: 100%;' : 'width: 100%; border: 1px solid var(--border-color); margin: 4px 0; border-radius: 4px; box-shadow: none;';
             let html = `<table class="reports-table" style="${tableStyle}">`;
-            
+
             if (depth === 0) {
                 html += '<thead><tr><th style="width: 30%">Property</th><th>Value</th></tr></thead>';
             }
             html += '<tbody>';
-            
+
             for (const [key, value] of Object.entries(obj)) {
                 let displayValue = '';
-                
+
                 if (key === 'flags' && Array.isArray(value)) {
                     displayValue = '<div style="display: flex; gap: 8px; flex-wrap: wrap;">';
                     value.forEach(flag => {
@@ -772,17 +1556,17 @@
                         displayValue = strVal.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
                     }
                 }
-                
+
                 const displayKey = key.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-                
-                let tdKeyStyle = depth === 0 
-                    ? 'font-weight: 500; color: var(--text-primary); vertical-align: top;' 
+
+                let tdKeyStyle = depth === 0
+                    ? 'font-weight: 500; color: var(--text-primary); vertical-align: top;'
                     : 'font-weight: 500; color: var(--text-secondary); vertical-align: top; background: #2a2a2a; border-right: 1px solid var(--border-color); width: 30%; padding: 8px 12px; font-size: 13px;';
-                
-                let tdValStyle = depth === 0 
+
+                let tdValStyle = depth === 0
                     ? 'word-break: break-word; vertical-align: top;'
                     : 'word-break: break-word; vertical-align: top; padding: 8px 12px; font-size: 13px; background: transparent;';
-                
+
                 html += `<tr><td style="${tdKeyStyle}">${displayKey}</td><td style="${tdValStyle}">${displayValue}</td></tr>`;
             }
             html += '</tbody></table>';
@@ -797,7 +1581,7 @@
 
         async function openTransactionModal(accountId) {
             if (accountId === 'N/A') return;
-            
+
             const content = document.getElementById('transactionModalContent');
             document.getElementById('transactionModalTitle').textContent = `Transactions for Account: ${accountId}`;
             content.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-secondary);">Loading transactions...</div>';
@@ -812,7 +1596,7 @@
                         const keys = Object.keys(data.transactions[0]).filter(k => k !== 'analysis_status' && k !== 'uploaded_at');
                         keys.forEach(k => html += `<th>${k.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}</th>`);
                         html += '</tr></thead><tbody>';
-                        
+
                         data.transactions.forEach(tx => {
                             html += '<tr>';
                             keys.forEach(k => {
@@ -845,7 +1629,7 @@
                 // Fetch full details
                 const response = await fetch(`/api/transaction/${partialTxn.transaction_id}`);
                 const data = await response.json();
-                
+
                 let transaction = partialTxn;
                 if (data.success && data.transaction) {
                     transaction = data.transaction;
@@ -866,7 +1650,7 @@
                     if (Array.isArray(flags) && flags.length > 0) {
                         flagHtml = `<ul>${flags.map(f => `<li>${f}</li>`).join('')}</ul>`;
                     } else { flagHtml = '<p>No specific risk flags recorded.</p>'; }
-                } catch(e) { flagHtml = '<p>No specific risk flags recorded.</p>'; }
+                } catch (e) { flagHtml = '<p>No specific risk flags recorded.</p>'; }
 
                 let linkHtml = '';
                 try {
@@ -875,7 +1659,7 @@
                     if (Array.isArray(links) && links.length > 0) {
                         linkHtml = `<ul>${links.map(l => `<li><a href="${l}">${l}</a></li>`).join('')}</ul>`;
                     } else { linkHtml = '<p>No adverse media links found.</p>'; }
-                } catch(e) { linkHtml = '<p>No adverse media links found.</p>'; }
+                } catch (e) { linkHtml = '<p>No adverse media links found.</p>'; }
 
                 container.innerHTML = `
                     <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #ef4444; padding-bottom: 10px;">
@@ -928,15 +1712,15 @@
                 `;
 
                 const opt = {
-                    margin:       0.5,
-                    filename:     `SAR_${transaction.transaction_id || 'Report'}.pdf`,
-                    image:        { type: 'jpeg', quality: 0.98 },
-                    html2canvas:  { scale: 2 },
-                    jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+                    margin: 0.5,
+                    filename: `SAR_${transaction.transaction_id || 'Report'}.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2 },
+                    jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
                 };
 
                 html2pdf().set(opt).from(container).save();
-                
+
             } catch (error) {
                 console.error("SAR Download Error:", error);
                 alert("Could not generate SAR. Please try again.");
@@ -961,14 +1745,14 @@
             container.style.color = '#111827';
             container.style.background = '#ffffff';
             container.style.width = '900px';
-            
+
             // To prevent html2canvas clipping, we append to DOM off-screen
             const wrapper = document.createElement('div');
             wrapper.style.position = 'absolute';
             wrapper.style.left = '-9999px';
             wrapper.style.top = '0';
             wrapper.appendChild(container);
-            document.body.appendChild(wrapper); 
+            document.body.appendChild(wrapper);
 
             let html = `
                 <style>
@@ -994,7 +1778,7 @@
                 const qa = reportData.qa || {};
                 const tx = reportData.transaction || {};
                 const riskLevel = (row.risk_level || qa.risk_level || 'N/A').toUpperCase();
-                
+
                 if (riskLevel === 'HIGH') {
                     high++;
                     highRiskTxns.push(row);
@@ -1021,7 +1805,7 @@
             `;
 
             html += `<h2 style="font-size: 18px; color: #111827; border-bottom: 1px solid #e5e7eb; padding-bottom: 10px; margin-bottom: 20px;">Critical High-Risk Transactions (${highRiskTxns.length})</h2>`;
-            
+
             if (highRiskTxns.length > 0) {
                 html += `<table style="width: 100%; border-collapse: collapse; margin-bottom: 24px; font-size: 11.5px;">
                     <thead>
@@ -1032,14 +1816,14 @@
                         </tr>
                     </thead>
                     <tbody>`;
-                
+
                 highRiskTxns.forEach(row => {
                     const reportData = row.report || row;
                     const qa = reportData.qa || {};
                     const tx = reportData.transaction || {};
                     const accountId = row.account_id || tx.account_id || 'N/A';
                     const txId = row.transaction_id || tx.transaction_id || qa.transaction_id || 'N/A';
-                    
+
                     let flagsStr = '-';
                     const flagsArr = row.flags || qa.flags || [];
                     if (Array.isArray(flagsArr)) flagsStr = flagsArr.join(', ');
@@ -1047,7 +1831,7 @@
                         try {
                             const parsed = JSON.parse(flagsArr);
                             if (Array.isArray(parsed)) flagsStr = parsed.join(', ');
-                        } catch(e) {}
+                        } catch (e) { }
                     }
 
                     html += `
@@ -1067,11 +1851,11 @@
             container.innerHTML = html;
 
             const opt = {
-                margin:       10,
-                filename:     'TRACE_Executive_Brief.pdf',
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true, scrollX: 0, scrollY: 0 },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' }
+                margin: 10,
+                filename: 'TRACE_Executive_Brief.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, scrollX: 0, scrollY: 0 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
             };
 
             html2pdf().set(opt).from(container).save().then(() => {
@@ -1090,7 +1874,7 @@
         // Voice Search Implementation
         const voiceBtn = document.getElementById('voiceBtn');
         const messageInput = document.getElementById('messageInput');
-        
+
         // Check for browser support
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (SpeechRecognition) {
@@ -1102,13 +1886,13 @@
 
             let isRecording = false;
 
-            recognition.onstart = function() {
+            recognition.onstart = function () {
                 isRecording = true;
                 voiceBtn.classList.add('recording');
                 messageInput.placeholder = "Listening...";
             };
 
-            recognition.onresult = function(event) {
+            recognition.onresult = function (event) {
                 let interimTranscript = '';
                 let finalTranscript = '';
 
@@ -1119,30 +1903,30 @@
                         interimTranscript += event.results[i][0].transcript;
                     }
                 }
-                
+
                 // Update input field in real-time
                 if (finalTranscript) {
                     messageInput.value = finalTranscript;
                 } else {
                     messageInput.value = interimTranscript;
                 }
-                
+
                 // Trigger auto-resize
                 messageInput.dispatchEvent(new Event('input'));
             };
 
-            recognition.onerror = function(event) {
+            recognition.onerror = function (event) {
                 console.error("Speech recognition error:", event.error);
                 isRecording = false;
                 voiceBtn.classList.remove('recording');
                 messageInput.placeholder = "Ask anything";
-                
+
                 if (event.error === 'not-allowed') {
                     alert("Microphone access is blocked by your browser. Please go to your browser settings (chrome://settings/content/microphone) and explicitly allow localhost:3000 to use your microphone.");
                 }
             };
 
-            recognition.onend = function() {
+            recognition.onend = function () {
                 isRecording = false;
                 voiceBtn.classList.remove('recording');
                 messageInput.placeholder = "Ask anything";
@@ -1163,4 +1947,5 @@
         }
     </script>
 </body>
+
 </html>

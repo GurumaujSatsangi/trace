@@ -1,2 +1,8 @@
 .env
 /node_modules
+*.log
+out.log
+test_*.js
+api_test.js
+diagnose.js
+*test_output*
