@@ -112,7 +112,7 @@
         .message.user .avatar { display: none; }
 
         .message-content {
-            font-size: 16px; line-height: 1.6; max-width: 80%;
+            font-size: 16px; line-height: 1.6; max-width: 80%; overflow-x: auto;
         }
 
         .message.user .message-content {
@@ -125,7 +125,7 @@
         }
 
         /* AI Message Rich Content Elements */
-        .verdict-box { background: var(--bg-sidebar); border: 1px solid var(--border-color); padding: 16px; border-radius: 8px; margin-bottom: 16px; color: var(--text-primary); font-size: 14.5px; }
+        .verdict-box { background: var(--bg-sidebar); border: 1px solid var(--border-color); padding: 16px; border-radius: 8px; margin-bottom: 16px; color: var(--text-primary); font-size: 14.5px; overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 16px; background: transparent; }
         th, td { border: 1px solid var(--border-color); padding: 10px 14px; text-align: left; }
         th { background: #2a2a2a; font-weight: 600; color: var(--text-primary); }
@@ -409,6 +409,7 @@
         });
 
         // Handle Chat Query
+        let conversationContext = [];
         chatForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const messageInput = document.getElementById('messageInput');
@@ -435,7 +436,7 @@
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message })
+                    body: JSON.stringify({ message, history: conversationContext })
                 });
                 const result = await response.json();
 
@@ -454,12 +455,19 @@
                             }
                         }
                         aiHtml += `<div class="verdict-box">${formattedVerdict.join('')}</div>`;
+                        
+                        // Update History Context
+                        conversationContext.push({ role: 'user', content: message });
+                        conversationContext.push({ role: 'assistant', content: result.sql });
+                        if (conversationContext.length > 16) {
+                            conversationContext = conversationContext.slice(-16); // Keep last 8 turns
+                        }
                     }
 
                     const highRiskTxns = result.results.filter(r => r.risk_level && r.risk_level.toUpperCase() === 'HIGH');
                     if (highRiskTxns.length > 0) {
-                        const txnData = encodeURIComponent(JSON.stringify(highRiskTxns[0]));
-                        const verdictData = encodeURIComponent(result.complianceVerdict || "");
+                        const txnData = encodeURIComponent(JSON.stringify(highRiskTxns[0])).replace(/'/g, '%27');
+                        const verdictData = encodeURIComponent(result.complianceVerdict || "").replace(/'/g, '%27');
                         aiHtml += `<button style="margin-top: 10px; background-color: #dc2626; color: white; font-weight: bold; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 6px;" onclick="downloadSAR('${txnData}', '${verdictData}')">
                                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                                       Download SAR

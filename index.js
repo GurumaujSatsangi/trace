@@ -9,7 +9,7 @@ import "dotenv/config";
 import { ChatOpenAI } from "@langchain/openai";
 import PDFDocument from "pdfkit";
 import { graph } from "./agents/graph.js";
-import { HumanMessage, SystemMessage } from "@langchain/core/messages";
+import { HumanMessage, SystemMessage, AIMessage } from "@langchain/core/messages";
 import duckdb from "duckdb";
 
 // DuckDB returns BigInts for some fields, which natively causes JSON.stringify to throw an error.
@@ -277,7 +277,7 @@ app.get("/api/transactions/:account_id", async (req, res) => {
 
 app.post("/api/chat", async (req, res) => {
     try {
-        const { message } = req.body;
+        const { message, history } = req.body;
 
         if (!message || !message.trim()) {
             return res.status(400).json({ error: "Please provide a message to analyse." });
@@ -298,15 +298,24 @@ app.post("/api/chat", async (req, res) => {
 The database has two tables:
 1. transactions: ${txColumns}
 2. compliance_reports: ${reportsColumns}
-Write a valid DuckDB SQL query that answers the user's request.
+Write a valid DuckDB SQL query that answers the user's latest request.
+CRITICAL: You will be provided with the conversation history. You MUST use the conversation history to resolve pronouns and contextual references (e.g., "this customer", "that account"). Look at your previous SQL queries to infer the entity the user is referring to.
 IMPORTANT: DO NOT use SELECT *. You MUST select only the specific columns needed to answer the question, as the full rows are too large for the context window (especially avoid graph_state and enrichment_data). Always include identifying columns like account_id and transaction_id so the context is clear.
 IMPORTANT: For filtering by risk_level, the exact string values are 'HIGH', 'MEDIUM', 'LOW' (all caps). Use ILIKE for text matching to be safe.
 Return ONLY the raw SQL query string with no markdown and no extra text.`;
 
-        const sqlAiResponse = await model.invoke([
-            new SystemMessage(sqlSystemPrompt),
-            new HumanMessage(message)
-        ]);
+        const messages = [new SystemMessage(sqlSystemPrompt)];
+        
+        if (Array.isArray(history)) {
+            history.forEach(msg => {
+                if (msg.role === 'user') messages.push(new HumanMessage(msg.content));
+                else if (msg.role === 'assistant') messages.push(new AIMessage(msg.content));
+            });
+        }
+        
+        messages.push(new HumanMessage(message));
+
+        const sqlAiResponse = await model.invoke(messages);
 
         const generatedSql = String(sqlAiResponse.content || "")
             .trim()
