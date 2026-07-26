@@ -146,9 +146,9 @@ export async function detectStructuring({ dateFilter, filters, runDuckQuery }) {
 
         let summary;
         if (candidates.length === 0) {
-            summary = `I found ${transactionsInRange} transactions ${rangeDesc}, but none met the configured structuring-pattern criteria (transactions with amounts between $9,000 and $10,000 in cash/deposit categories).`;
+            summary = `I found ${transactionsInRange} transactions ${rangeDesc}, but none met the near-threshold transaction indicator (amounts between $9,000 and $10,000 in cash/deposit categories).`;
         } else {
-            summary = `Found ${candidates.length} candidate structuring pattern(s) ${rangeDesc} across ${transactionsInRange} total transactions.`;
+            summary = `Found ${candidates.length} candidate group(s) with near-threshold activity ${rangeDesc} across ${transactionsInRange} total transactions.`;
         }
 
         return {

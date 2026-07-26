@@ -735,8 +735,8 @@ app.post("/api/chat", async (req, res) => {
             // Format structuring evidence for the LLM
             const structuringEvidence = {
                 ...sr,
-                analysisType: "candidate_structuring_patterns",
-                note: "These are candidate patterns based on the configured structuring indicator (amounts $9,000-$9,999 in cash/deposit categories). They are not definitive proof of structuring."
+                analysisType: "candidate_structuring_indicators",
+                note: "These are accounts demonstrating near-threshold activity based on the single-transaction indicator (amounts $9,000-$9,999 in cash/deposit categories), rather than a confirmed sequence structuring pattern."
             };
 
             const verdict = await formatGroundedResponse({
