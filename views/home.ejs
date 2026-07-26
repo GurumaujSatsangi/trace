@@ -4,24 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TRACE - AI Compliance</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root {
-            --bg: #ffffff;
-            --sidebar-bg: #111827;
-            --sidebar-text: #f3f4f6;
-            --primary: #10b981;
-            --primary-hover: #059669;
-            --border: #e5e7eb;
-            --user-msg: #f3f4f6;
-            --ai-msg: #ffffff;
-            --text-main: #1f2937;
+            --bg-main: #212121;
+            --bg-sidebar: #171717;
+            --bg-input: #2f2f2f;
+            --text-primary: #ececec;
+            --text-secondary: #b4b4b4;
+            --hover-bg: #2f2f2f;
+            --border-color: #383838;
         }
 
         body, html {
             margin: 0; padding: 0; height: 100vh;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: var(--bg); color: var(--text-main);
+            font-family: Söhne, "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, Cantarell, "Noto Sans", sans-serif;
+            background: var(--bg-main); color: var(--text-primary);
             overflow: hidden;
+        }
+
+        /* Custom Scrollbar to match ChatGPT */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        /* For Firefox */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
         }
 
         .app-container {
@@ -30,113 +54,153 @@
 
         /* Sidebar */
         .sidebar {
-            width: 320px; background: var(--sidebar-bg); color: var(--sidebar-text);
-            display: flex; flex-direction: column; padding: 24px; box-sizing: border-box;
-            border-right: 1px solid #1f2937;
+            width: 260px; background: var(--bg-sidebar); color: var(--text-primary);
+            display: flex; flex-direction: column; padding: 16px 12px; box-sizing: border-box;
         }
 
-        .sidebar-header h2 { margin: 0 0 4px 0; font-size: 24px; color: white; letter-spacing: 1px; }
-        .sidebar-header p { margin: 0 0 30px 0; font-size: 13px; color: #9ca3af; }
+        .sidebar-header { margin-bottom: 24px; padding: 0 8px; }
+        .sidebar-header h2 { font-size: 16px; font-weight: 600; margin: 0; color: var(--text-primary); }
 
-        .sidebar-section h3 { font-size: 12px; text-transform: uppercase; color: #6b7280; letter-spacing: 1px; margin-bottom: 12px; }
+        .sidebar-menu { display: flex; flex-direction: column; gap: 4px; }
         
-        input[type="file"] { width: 100%; padding: 10px; margin-bottom: 15px; background: #1f2937; border: 1px dashed #374151; border-radius: 8px; color: #d1d5db; box-sizing: border-box; }
-        .btn-sidebar { width: 100%; background: var(--primary); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; transition: 0.2s; }
-        .btn-sidebar:hover { background: var(--primary-hover); }
-        .btn-sidebar:disabled { background: #374151; color: #9ca3af; cursor: not-allowed; }
+        .sidebar-item {
+            display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 8px;
+            background: transparent; color: var(--text-primary); border: none; cursor: pointer;
+            font-size: 14px; font-weight: 500; transition: background 0.2s; font-family: inherit;
+            text-align: left;
+        }
+        .sidebar-item:hover, .sidebar-item.active { background: var(--hover-bg); }
+        .sidebar-item svg { color: var(--text-primary); flex-shrink: 0; }
 
-        #uploadStatus { margin-top: 15px; font-size: 13px; line-height: 1.5; padding: 10px; border-radius: 6px; }
-        #uploadStatus.success { background: #064e3b; color: #a7f3d0; }
-        #uploadStatus.error { background: #7f1d1d; color: #fecaca; }
-        #uploadStatus.processing { background: #1e3a8a; color: #bfdbfe; }
+        .upload-status {
+            padding: 12px; border-radius: 8px; font-size: 13px; line-height: 1.4; margin-top: 10px;
+            background: var(--bg-input); border: 1px solid var(--border-color);
+        }
+        .upload-status.success { color: #a7f3d0; border-color: #059669; }
+        .upload-status.error { color: #fecaca; border-color: #dc2626; }
+        .upload-status.processing { color: #bfdbfe; border-color: #2563eb; }
 
         /* Main Chat Area */
         .chat-container {
-            flex: 1; display: flex; flex-direction: column; background: #ffffff;
-            position: relative;
+            flex: 1; display: flex; flex-direction: column; background: var(--bg-main); position: relative;
         }
 
         .chat-history {
-            flex: 1; overflow-y: auto; padding: 40px 20px; display: flex; flex-direction: column; gap: 30px;
-            scroll-behavior: smooth;
+            flex: 1; overflow-y: auto; padding: 40px 20px 0; display: flex; flex-direction: column; gap: 24px;
+            scroll-behavior: smooth; position: relative; align-items: center;
         }
+
+        .empty-state {
+            position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%);
+            text-align: center; display: flex;
+        }
+        .empty-state h2 { font-size: 28px; font-weight: 600; margin: 0; color: var(--text-primary); letter-spacing: -0.5px; }
 
         .message {
-            display: flex; gap: 16px; max-width: 850px; margin: 0 auto; width: 100%;
+            display: flex; gap: 16px; width: 100%; max-width: 800px; padding: 0 12px; box-sizing: border-box;
         }
 
-        .message.user { flex-direction: row-reverse; }
-        
+        .message.user { justify-content: flex-end; }
+        .message.ai { justify-content: flex-start; }
+
         .avatar {
-            width: 34px; height: 34px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px; flex-shrink: 0; color: white;
+            width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-weight: 600; font-size: 12px; flex-shrink: 0; color: white;
         }
-        .message.ai .avatar { background: #10b981; }
-        .message.user .avatar { background: #3b82f6; display: none; }
+        .message.ai .avatar { background: #10a37f; } /* ChatGPT icon color */
+        .message.ai .avatar svg { width: 18px; height: 18px; }
+        .message.user .avatar { display: none; }
 
         .message-content {
-            font-size: 15px; line-height: 1.6; max-width: 85%;
+            font-size: 16px; line-height: 1.6; max-width: 80%;
         }
 
         .message.user .message-content {
-            background: #f3f4f6; color: #111827; padding: 12px 18px; border-radius: 20px; border-bottom-right-radius: 4px;
+            background: var(--bg-input); padding: 12px 18px; border-radius: 20px;
+            color: var(--text-primary); word-break: break-word;
+        }
+
+        .message.ai .message-content {
+            color: var(--text-primary); width: 100%; max-width: 100%;
         }
 
         /* AI Message Rich Content Elements */
-        .verdict-box { background: #ffffff; border: 1px solid #e5e7eb; padding: 16px; border-radius: 8px; margin-bottom: 16px; color: #1f2937; font-size: 14.5px; }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 16px; background: white; }
-        th, td { border: 1px solid #e5e7eb; padding: 10px 14px; text-align: left; }
-        th { background: #f8fafc; font-weight: 600; color: #475569; }
-        .table-responsive { overflow-x: auto; border-radius: 8px; border: 1px solid #e5e7eb; margin-bottom: 16px; }
-        .sql-pre { background: #0f172a; color: #e2e8f0; padding: 12px 16px; border-radius: 8px; font-size: 13px; overflow-x: auto; margin: 0; }
-        .sql-header { font-size: 12px; color: #64748b; margin-bottom: 6px; font-weight: 600; text-transform: uppercase; }
+        .verdict-box { background: var(--bg-sidebar); border: 1px solid var(--border-color); padding: 16px; border-radius: 8px; margin-bottom: 16px; color: var(--text-primary); font-size: 14.5px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 16px; background: transparent; }
+        th, td { border: 1px solid var(--border-color); padding: 10px 14px; text-align: left; }
+        th { background: #2a2a2a; font-weight: 600; color: var(--text-primary); }
+        .table-responsive { overflow-x: auto; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 16px; }
+        .sql-pre { background: #000000; color: #e2e8f0; padding: 12px 16px; border-radius: 8px; font-size: 13px; overflow-x: auto; margin: 0; }
 
         /* Input Area */
         .input-area {
-            padding: 20px 40px 30px 40px; background: linear-gradient(0deg, white 60%, rgba(255,255,255,0));
+            padding: 20px 40px; width: 100%; max-width: 800px; margin: 0 auto; box-sizing: border-box;
+            background: linear-gradient(0deg, var(--bg-main) 70%, rgba(33,33,33,0));
         }
 
         .input-area form {
-            max-width: 850px; margin: 0 auto; position: relative; display: flex; gap: 12px; align-items: flex-end;
-            background: white; border: 1px solid #d1d5db; border-radius: 24px; padding: 8px 12px; box-shadow: 0 0 15px rgba(0,0,0,0.05);
+            position: relative; display: flex; gap: 12px; align-items: flex-end;
+            background: var(--bg-input); border: 1px solid transparent;
+            border-radius: 24px; padding: 8px 12px;
         }
-        .input-area form:focus-within { border-color: #3b82f6; box-shadow: 0 0 20px rgba(59,130,246,0.1); }
+        .input-area form:focus-within { border-color: #555; }
+
+        .btn-attach {
+            height: 36px; width: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            background: transparent; color: var(--text-primary); border: none; cursor: pointer; flex-shrink: 0; margin-bottom: 2px;
+        }
+        .btn-attach:hover { background: #404040; }
 
         .input-area textarea {
-            flex: 1; min-height: 24px; max-height: 200px; padding: 10px 8px; border: none; resize: none; font-size: 15px; line-height: 1.5; font-family: inherit; background: transparent; outline: none;
+            flex: 1; min-height: 24px; max-height: 200px; padding: 10px 0; border: none; resize: none; font-size: 16px;
+            line-height: 1.5; font-family: inherit; background: transparent; color: var(--text-primary); outline: none;
         }
+        .input-area textarea::placeholder { color: #8e8e8e; }
 
-        .input-area button {
-            height: 40px; width: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #10b981; color: white; border: none; cursor: pointer; transition: 0.2s; flex-shrink: 0;
+        .input-area #chatBtn {
+            height: 36px; width: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            background: #ececec; color: #212121; border: none; cursor: pointer; transition: 0.2s; flex-shrink: 0; margin-bottom: 2px;
         }
-        .input-area button:hover { background: #059669; }
-        .input-area button:disabled { background: #d1d5db; cursor: not-allowed; }
+        .input-area #chatBtn:hover { background: #ffffff; }
+        .input-area #chatBtn:disabled { background: #404040; color: #8e8e8e; cursor: not-allowed; }
+
+        .disclaimer { text-align: center; font-size: 12px; color: var(--text-secondary); margin-top: 12px; }
 
         /* Loading Spinner */
-        .loading-badge { display: inline-flex; align-items: center; gap: 10px; background: #eff6ff; padding: 8px 16px; border-radius: 20px; font-size: 13px; color: #1e40af; border: 1px solid #bfdbfe; margin-bottom: 20px; font-weight: 500; }
-        .spinner-small { width: 14px; height: 14px; border: 2px solid #93c5fd; border-top-color: #2563eb; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        .loading-badge { display: inline-flex; align-items: center; gap: 10px; font-size: 14px; color: var(--text-secondary); font-weight: 500; }
+        .spinner-small { width: 14px; height: 14px; border: 2px solid var(--text-secondary); border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
         /* Tabular View & Modals */
-        #tabularView { flex: 1; padding: 40px; overflow-y: auto; display: none; background: #f9fafb; }
-        #tabularView h2 { margin-top: 0; margin-bottom: 24px; color: #111827; }
-        .reports-table { width: 100%; border-collapse: collapse; background: white; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; font-size: 14px; }
-        .reports-table th, .reports-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #e5e7eb; }
-        .reports-table th { background: #f3f4f6; font-weight: 600; color: #374151; }
+        #tabularView { flex: 1; padding: 40px; overflow-y: auto; display: none; background: var(--bg-main); }
+        #tabularView h2 { margin-top: 0; margin-bottom: 24px; color: var(--text-primary); }
+        .reports-table { width: 100%; border-collapse: collapse; background: var(--bg-sidebar); border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; font-size: 14px; color: var(--text-primary); }
+        .reports-table th, .reports-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border-color); }
+        .reports-table th { background: #2f2f2f; font-weight: 600; color: var(--text-primary); }
         .reports-table tr:last-child td { border-bottom: none; }
-        .reports-table tr:hover { background: #f8fafc; }
-        .reports-table a { color: #2563eb; text-decoration: none; cursor: pointer; font-weight: 500; }
+        .reports-table tr:hover { background: #2a2a2a; }
+        .reports-table a { color: #60a5fa; text-decoration: none; cursor: pointer; font-weight: 500; }
         .reports-table a:hover { text-decoration: underline; }
-        .btn-view-details { background: #e0e7ff; color: #4338ca; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500; transition: 0.2s; }
-        .btn-view-details:hover { background: #c7d2fe; }
+        .btn-view-details { background: #ffffff; color: #000000; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; transition: 0.2s; }
+        .btn-view-details:hover { background: #d4d4d4; }
 
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: white; width: 85%; max-width: 900px; max-height: 85vh; border-radius: 8px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
-        .modal-header { padding: 16px 20px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; background: #f8fafc; }
-        .modal-header h3 { margin: 0; color: #0f172a; font-size: 18px; }
-        .close-modal { background: none; border: none; font-size: 24px; cursor: pointer; color: #64748b; line-height: 1; padding: 0; }
-        .close-modal:hover { color: #0f172a; }
-        .modal-body { padding: 20px; overflow-y: auto; flex: 1; }
-        .json-pre { background: #0f172a; color: #e2e8f0; padding: 16px; border-radius: 8px; overflow-x: auto; margin: 0; font-size: 13.5px; line-height: 1.5; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+        #searchInput, #riskFilter {
+            background: var(--bg-input); color: var(--text-primary); border: 1px solid var(--border-color); padding: 10px; border-radius: 8px; font-size: 14px; outline: none;
+        }
+        #searchInput:focus, #riskFilter:focus { border-color: #555; }
+        #searchInput::placeholder { color: var(--text-secondary); }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: var(--bg-main); color: var(--text-primary); width: 85%; max-width: 900px; max-height: 85vh; border-radius: 20px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8); border: 1px solid var(--border-color); }
+        .modal-header { padding: 24px 24px 16px; display: flex; justify-content: space-between; align-items: center; background: transparent; border-bottom: none; }
+        .modal-header h3 { margin: 0; color: var(--text-primary); font-size: 20px; font-weight: 600; letter-spacing: -0.02em; }
+        .close-modal { background: none; border: none; font-size: 28px; cursor: pointer; color: var(--text-secondary); line-height: 1; padding: 0; transition: color 0.2s; }
+        .close-modal:hover { color: var(--text-primary); }
+        .modal-body { padding: 0 24px 24px; overflow-y: auto; flex: 1; }
+        .json-pre { background: #000000; color: #e2e8f0; padding: 16px; border-radius: 8px; overflow-x: auto; margin: 0; font-size: 13.5px; line-height: 1.5; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+        
+        /* Utility */
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
@@ -145,46 +209,52 @@
         <aside class="sidebar">
             <div class="sidebar-header">
                 <h2>TRACE</h2>
-                <p>AI Compliance Engine</p>
             </div>
             
-            <div class="sidebar-section">
-                <h3>1. Dataset Upload</h3>
-                <form id="uploadForm">
-                    <input type="file" name="csvFile" id="csvFile" accept=".csv" required>
-                    <button type="submit" id="uploadBtn" class="btn-sidebar">Upload & Sync</button>
-                </form>
-                <div id="uploadStatus" style="display: none;"></div>
+            <div class="sidebar-menu">
+                <button type="button" id="addDatasetBtn" class="sidebar-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                    Add dataset
+                </button>
+                <button type="button" id="chatViewBtn" class="sidebar-item active">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                    Chat view
+                </button>
+                <button type="button" id="tabViewBtn" class="sidebar-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                    Tabular view
+                </button>
             </div>
-
-            <div class="sidebar-section" style="margin-top: 24px;">
-                <h3>2. Views</h3>
-                <button type="button" id="chatViewBtn" class="btn-sidebar" style="margin-bottom: 12px;">Chat View</button>
-                <button type="button" id="tabViewBtn" class="btn-sidebar" style="background: #374151;">Tabular View</button>
-            </div>
+            
+            <div style="flex: 1;"></div>
+            
+            <!-- Hidden Upload Form -->
+            <form id="uploadForm" class="hidden">
+                <input type="file" name="csvFile" id="csvFile" accept=".csv" required>
+            </form>
+            <div id="uploadStatus" class="upload-status hidden"></div>
         </aside>
 
         <!-- Main Chat Area -->
         <main class="chat-container" id="chatView">
             <div class="chat-history" id="chatHistory">
-                <!-- Welcome Message -->
-                <div class="message ai">
-                    <div class="avatar">AI</div>
-                    <div class="message-content">
-                        <strong>Hello! I am TRACE, your AI Compliance Officer.</strong><br><br>
-                        Please upload your transaction dataset in the sidebar first. Once synced, you can ask me to analyze accounts, find high-risk transactions, or evaluate compliance rules!
-                    </div>
+                <div class="empty-state" id="emptyState">
+                    <h2>What's on your mind today?</h2>
                 </div>
             </div>
 
             <!-- Input area -->
             <div class="input-area">
                 <form id="chatForm">
-                    <textarea name="message" id="messageInput" placeholder="Message TRACE (e.g., Show me transactions by ACC1009...)" required rows="1" oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'"></textarea>
+                    <button type="button" class="btn-attach" onclick="document.getElementById('addDatasetBtn').click()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    </button>
+                    <textarea name="message" id="messageInput" placeholder="Ask anything" required rows="1" oninput="this.style.height = ''; this.style.height = Math.min(this.scrollHeight, 200) + 'px'"></textarea>
                     <button type="submit" id="chatBtn">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
                     </button>
                 </form>
+                <div class="disclaimer">TRACE can make mistakes. Verify important information.</div>
             </div>
         </main>
 
@@ -197,16 +267,20 @@
 
             <!-- Filter and Search Area -->
             <div style="display: flex; gap: 12px; margin-bottom: 16px; align-items: center;">
-                <input type="text" id="searchInput" placeholder="Search by Account ID, Transaction ID, or Customer Name..." style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #d1d5db; font-size: 14px;">
-                <select id="riskFilter" style="padding: 10px; border-radius: 8px; border: 1px solid #d1d5db; font-size: 14px;">
+                <input type="text" id="searchInput" placeholder="Search by Account ID, Transaction ID, or Customer Name..." style="flex: 1;">
+                <select id="riskFilter">
                     <option value="ALL">All Risk Levels</option>
                     <option value="HIGH">High Risk</option>
                     <option value="MEDIUM">Medium Risk</option>
                     <option value="LOW">Low Risk</option>
                 </select>
+                <button id="exportBriefBtn" class="btn-view-details" style="background: #ffffff; color: #000; display: flex; align-items: center; gap: 6px; padding: 10px 16px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    Export PDF Brief
+                </button>
             </div>
 
-            <div style="overflow-x: auto; border-radius: 8px; border: 1px solid #e5e7eb;">
+            <div style="overflow-x: auto; border-radius: 8px; border: 1px solid var(--border-color);">
                 <table class="reports-table">
                     <thead>
                         <tr>
@@ -219,7 +293,7 @@
                         </tr>
                     </thead>
                     <tbody id="reportsTableBody">
-                        <tr><td colspan="6" style="text-align: center; color: #64748b;">No data loaded.</td></tr>
+                        <tr><td colspan="6" style="text-align: center; color: var(--text-secondary);">No data loaded.</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -255,16 +329,19 @@
         const chatHistory = document.getElementById('chatHistory');
         const uploadForm = document.getElementById('uploadForm');
         const chatForm = document.getElementById('chatForm');
+        const csvFile = document.getElementById('csvFile');
+        const addDatasetBtn = document.getElementById('addDatasetBtn');
+        const emptyState = document.getElementById('emptyState');
         
         function scrollToBottom() {
             chatHistory.scrollTop = chatHistory.scrollHeight;
         }
 
         function appendUserMessage(text) {
+            if (emptyState) emptyState.classList.add('hidden');
             const msg = document.createElement('div');
             msg.className = 'message user';
             msg.innerHTML = `
-                <div class="avatar">U</div>
                 <div class="message-content">${text.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>
             `;
             chatHistory.appendChild(msg);
@@ -272,10 +349,13 @@
         }
 
         function appendAiMessage(htmlContent) {
+            if (emptyState) emptyState.classList.add('hidden');
             const msg = document.createElement('div');
             msg.className = 'message ai';
             msg.innerHTML = `
-                <div class="avatar">AI</div>
+                <div class="avatar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10H12V2z"></path><path d="M12 12 2.1 7.1"></path><path d="M12 12l9.9 4.9"></path></svg>
+                </div>
                 <div class="message-content" style="width: 100%; max-width: 100%;">${htmlContent}</div>
             `;
             chatHistory.appendChild(msg);
@@ -283,21 +363,29 @@
             return msg;
         }
 
+        // Handle Add Dataset Click
+        addDatasetBtn.addEventListener('click', () => {
+            csvFile.click();
+        });
+
+        csvFile.addEventListener('change', () => {
+            if (csvFile.files.length > 0) {
+                uploadForm.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+            }
+        });
+
         // Handle CSV Upload
         uploadForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData();
-            const fileField = document.getElementById('csvFile');
             const statusEl = document.getElementById('uploadStatus');
-            const submitBtn = document.getElementById('uploadBtn');
 
-            if (fileField.files.length === 0) return;
-            formData.append('csvFile', fileField.files[0]);
+            if (csvFile.files.length === 0) return;
+            formData.append('csvFile', csvFile.files[0]);
 
-            statusEl.style.display = 'block';
+            statusEl.classList.remove('hidden');
             statusEl.textContent = "Processing and analyzing dataset...";
-            statusEl.className = "processing";
-            submitBtn.disabled = true;
+            statusEl.className = "upload-status processing";
 
             try {
                 const response = await fetch('/api/upload', {
@@ -308,17 +396,15 @@
                 
                 if (response.ok) {
                     statusEl.textContent = `✓ ${result.message}`;
-                    statusEl.className = "success";
+                    statusEl.className = "upload-status success";
                     appendAiMessage(`<strong>Dataset Uploaded Successfully</strong><br>Parsed and synced ${result.totalInserted} records. I am ready to answer your questions!`);
                 } else {
                     statusEl.textContent = `✗ Error: ${result.error || 'Upload failed'}`;
-                    statusEl.className = "error";
+                    statusEl.className = "upload-status error";
                 }
             } catch (err) {
                 statusEl.textContent = `✗ Network error during upload.`;
-                statusEl.className = "error";
-            } finally {
-                submitBtn.disabled = false;
+                statusEl.className = "upload-status error";
             }
         });
 
@@ -341,7 +427,7 @@
             const loader = appendAiMessage(`
                 <div class="loading-badge" id="activeLoader">
                     <div class="spinner-small"></div>
-                    Evaluating AML patterns...
+                    Thinking...
                 </div>
             `);
 
@@ -372,7 +458,6 @@
 
                     const highRiskTxns = result.results.filter(r => r.risk_level && r.risk_level.toUpperCase() === 'HIGH');
                     if (highRiskTxns.length > 0) {
-                        // Use the first high risk transaction for the SAR report by default
                         const txnData = encodeURIComponent(JSON.stringify(highRiskTxns[0]));
                         const verdictData = encodeURIComponent(result.complianceVerdict || "");
                         aiHtml += `<button style="margin-top: 10px; background-color: #dc2626; color: white; font-weight: bold; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 6px;" onclick="downloadSAR('${txnData}', '${verdictData}')">
@@ -409,20 +494,20 @@
                 } else if (result.error === "SQL_ERROR") {
                     let errorMessage = result.details || "The query generated was invalid.";
                     appendAiMessage(`
-                        <div style="color: #dc2626; font-weight: 500; font-size: 14.5px; margin-bottom: 8px;">
+                        <div style="color: #f87171; font-weight: 500; font-size: 14.5px; margin-bottom: 8px;">
                             Oops, I had trouble understanding or querying the database.
                         </div>
-                        <div style="font-size: 13.5px; color: #475569; background: #fee2e2; padding: 12px; border-radius: 6px; border: 1px solid #fca5a5;">
+                        <div style="font-size: 13.5px; color: #fca5a5; background: rgba(220, 38, 38, 0.2); padding: 12px; border-radius: 6px; border: 1px solid #7f1d1d;">
                             <strong>Error Details:</strong><br>
                             ${String(errorMessage).replace(/</g, '&lt;')}
                         </div>
                     `);
                 } else {
-                    appendAiMessage(`<div style="color: #dc2626; font-weight: 500;">Error:</div><pre class="sql-pre">${JSON.stringify(result, null, 2)}</pre>`);
+                    appendAiMessage(`<div style="color: #f87171; font-weight: 500;">Error:</div><pre class="sql-pre">${JSON.stringify(result, null, 2)}</pre>`);
                 }
             } catch (err) {
                 loader.remove();
-                appendAiMessage(`<div style="color: #dc2626; font-weight: 500;">Network Error processing chat request.</div>`);
+                appendAiMessage(`<div style="color: #f87171; font-weight: 500;">Network Error processing chat request.</div>`);
             } finally {
                 if (!submitBtn.hasAttribute('data-rate-limited')) {
                     submitBtn.disabled = false;
@@ -449,21 +534,21 @@
         chatViewBtn.addEventListener('click', () => {
             chatView.style.display = 'flex';
             tabularView.style.display = 'none';
-            chatViewBtn.style.background = 'var(--primary)';
-            tabViewBtn.style.background = '#374151';
+            chatViewBtn.classList.add('active');
+            tabViewBtn.classList.remove('active');
         });
 
         tabViewBtn.addEventListener('click', () => {
             chatView.style.display = 'none';
             tabularView.style.display = 'block';
-            chatViewBtn.style.background = '#374151';
-            tabViewBtn.style.background = 'var(--primary)';
+            chatViewBtn.classList.remove('active');
+            tabViewBtn.classList.add('active');
             loadReports();
         });
 
         async function loadReports() {
             const tbody = document.getElementById('reportsTableBody');
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 24px; color: #64748b;">Loading reports...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 24px; color: var(--text-secondary);">Loading reports...</td></tr>';
             try {
                 const res = await fetch('/api/reports');
                 const data = await res.json();
@@ -471,10 +556,10 @@
                     reportsCache = data.reports;
                     renderReports(data.reports);
                 } else {
-                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #dc2626; padding: 24px;">Failed to load reports.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #f87171; padding: 24px;">Failed to load reports.</td></tr>';
                 }
             } catch (err) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #dc2626; padding: 24px;">Error connecting to server.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #f87171; padding: 24px;">Error connecting to server.</td></tr>';
             }
         }
 
@@ -521,15 +606,15 @@
 
             const statsCards = document.getElementById('statsCards');
             statsCards.innerHTML = `
-                <div style="flex: 1; padding: 16px; border-radius: 8px; border: 2px solid #dc2626; color: #dc2626; background: #fef2f2; text-align: center;">
+                <div style="flex: 1; padding: 16px; border-radius: 8px; border: 1px solid #ef4444; color: #ef4444; background: transparent; text-align: center;">
                     <div style="font-size: 14px; font-weight: 600; text-transform: uppercase; margin-bottom: 4px;">High Risk</div>
                     <div style="font-size: 28px; font-weight: bold;">${high}</div>
                 </div>
-                <div style="flex: 1; padding: 16px; border-radius: 8px; border: 2px solid #d97706; color: #d97706; background: #fffbeb; text-align: center;">
+                <div style="flex: 1; padding: 16px; border-radius: 8px; border: 1px solid #f59e0b; color: #f59e0b; background: transparent; text-align: center;">
                     <div style="font-size: 14px; font-weight: 600; text-transform: uppercase; margin-bottom: 4px;">Medium Risk</div>
                     <div style="font-size: 28px; font-weight: bold;">${medium}</div>
                 </div>
-                <div style="flex: 1; padding: 16px; border-radius: 8px; border: 2px solid #16a34a; color: #16a34a; background: #f0fdf4; text-align: center;">
+                <div style="flex: 1; padding: 16px; border-radius: 8px; border: 1px solid #10b981; color: #10b981; background: transparent; text-align: center;">
                     <div style="font-size: 14px; font-weight: 600; text-transform: uppercase; margin-bottom: 4px;">Low Risk</div>
                     <div style="font-size: 28px; font-weight: bold;">${low}</div>
                 </div>
@@ -546,7 +631,7 @@
             tbody.innerHTML = '';
             
             if (reports.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 24px; color: #64748b;">No matching compliance reports found.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 24px; color: var(--text-secondary);">No matching compliance reports found.</td></tr>';
                 return;
             }
 
@@ -564,14 +649,14 @@
                 else if (qa.risk_score !== undefined && qa.risk_score !== null) riskScore = qa.risk_score;
 
                 const riskLevel = row.risk_level || qa.risk_level || 'N/A';
-                const riskColor = riskLevel === 'HIGH' ? '#dc2626' : (riskLevel === 'MEDIUM' ? '#d97706' : '#16a34a');
+                const riskColor = riskLevel === 'HIGH' ? '#f87171' : (riskLevel === 'MEDIUM' ? '#fbbf24' : '#4ade80');
 
                 let flagsHtml = '-';
                 const flagsArr = row.flags || qa.flags || [];
                 if (Array.isArray(flagsArr) && flagsArr.length > 0) {
                     flagsHtml = '<div style="display: flex; gap: 4px; flex-wrap: wrap;">';
                     flagsArr.forEach(flag => {
-                        flagsHtml += `<span style="background: #f1f5f9; color: #475569; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 600;">${String(flag).replace(/</g, '&lt;')}</span>`;
+                        flagsHtml += `<span style="background: rgba(255,255,255,0.1); color: var(--text-primary); padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 600;">${String(flag).replace(/</g, '&lt;')}</span>`;
                     });
                     flagsHtml += '</div>';
                 } else if (typeof flagsArr === 'string') {
@@ -580,7 +665,7 @@
                         if (Array.isArray(parsed) && parsed.length > 0) {
                             flagsHtml = '<div style="display: flex; gap: 4px; flex-wrap: wrap;">';
                             parsed.forEach(flag => {
-                                flagsHtml += `<span style="background: #f1f5f9; color: #475569; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 600;">${String(flag).replace(/</g, '&lt;')}</span>`;
+                                flagsHtml += `<span style="background: rgba(255,255,255,0.1); color: var(--text-primary); padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 600;">${String(flag).replace(/</g, '&lt;')}</span>`;
                             });
                             flagsHtml += '</div>';
                         }
@@ -603,7 +688,7 @@
         function createTableFromJSON(obj, depth = 0) {
             if (obj === null || obj === undefined) return '';
             
-            let tableStyle = depth === 0 ? 'width: 100%;' : 'width: 100%; border: 1px solid #e5e7eb; margin: 4px 0; border-radius: 4px; box-shadow: none;';
+            let tableStyle = depth === 0 ? 'width: 100%;' : 'width: 100%; border: 1px solid var(--border-color); margin: 4px 0; border-radius: 4px; box-shadow: none;';
             let html = `<table class="reports-table" style="${tableStyle}">`;
             
             if (depth === 0) {
@@ -617,7 +702,7 @@
                 if (key === 'flags' && Array.isArray(value)) {
                     displayValue = '<div style="display: flex; gap: 8px; flex-wrap: wrap;">';
                     value.forEach(flag => {
-                        displayValue += `<span style="background: #fee2e2; color: #991b1b; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600;">${String(flag).replace(/</g, '&lt;')}</span>`;
+                        displayValue += `<span style="background: rgba(220, 38, 38, 0.2); color: #fca5a5; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600;">${String(flag).replace(/</g, '&lt;')}</span>`;
                     });
                     displayValue += '</div>';
                 } else if ((key === 'adverse_media_links' || key === 'links' || key === 'adverseMediaLinks') && Array.isArray(value)) {
@@ -625,7 +710,7 @@
                     value.forEach(link => {
                         if (typeof link === 'string' && (link.startsWith('http') || link.startsWith('www'))) {
                             let url = link.startsWith('http') ? link : 'https://' + link;
-                            displayValue += `<div><a href="${url}" target="_blank" style="word-break: break-all; font-size: 13px;">${link}</a></div>`;
+                            displayValue += `<div><a href="${url}" target="_blank" style="word-break: break-all; font-size: 13px; color: #60a5fa;">${link}</a></div>`;
                         } else if (typeof link === 'object') {
                             displayValue += createTableFromJSON(link, depth + 1);
                         } else {
@@ -639,7 +724,7 @@
                         if (typeof item === 'object' && item !== null) {
                             displayValue += `<div>${createTableFromJSON(item, depth + 1)}</div>`;
                         } else if (typeof item === 'string' && item.startsWith('http')) {
-                            displayValue += `<div><a href="${item}" target="_blank" style="word-break: break-all; font-size: 13px;">${item}</a></div>`;
+                            displayValue += `<div><a href="${item}" target="_blank" style="word-break: break-all; font-size: 13px; color: #60a5fa;">${item}</a></div>`;
                         } else {
                             displayValue += `<div>${String(item).replace(/</g, '&lt;')}</div>`;
                         }
@@ -648,8 +733,8 @@
                 } else if (typeof value === 'object' && value !== null) {
                     const nestedTable = createTableFromJSON(value, depth + 1);
                     if (depth <= 2) {
-                        displayValue = `<details style="border: 1px solid #e5e7eb; border-radius: 6px; margin: 4px 0;">
-                            <summary style="padding: 8px 12px; background: #f8fafc; cursor: pointer; font-size: 13px; font-weight: 500; color: #475569; border-bottom: 1px solid #e5e7eb;">
+                        displayValue = `<details style="border: 1px solid var(--border-color); border-radius: 6px; margin: 4px 0;">
+                            <summary style="padding: 8px 12px; background: #2a2a2a; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--text-primary); border-bottom: 1px solid var(--border-color);">
                                 Expand to view data
                             </summary>
                             <div style="padding: 0; overflow-x: auto;">
@@ -662,7 +747,7 @@
                 } else {
                     let strVal = String(value);
                     if (strVal.startsWith('http')) {
-                        displayValue = `<a href="${strVal}" target="_blank" style="word-break: break-all;">${strVal}</a>`;
+                        displayValue = `<a href="${strVal}" target="_blank" style="word-break: break-all; color: #60a5fa;">${strVal}</a>`;
                     } else {
                         displayValue = strVal.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
                     }
@@ -671,12 +756,12 @@
                 const displayKey = key.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
                 
                 let tdKeyStyle = depth === 0 
-                    ? 'font-weight: 500; color: #374151; vertical-align: top;' 
-                    : 'font-weight: 500; color: #475569; vertical-align: top; background: #f8fafc; border-right: 1px solid #e5e7eb; width: 30%; padding: 8px 12px; font-size: 13px;';
+                    ? 'font-weight: 500; color: var(--text-primary); vertical-align: top;' 
+                    : 'font-weight: 500; color: var(--text-secondary); vertical-align: top; background: #2a2a2a; border-right: 1px solid var(--border-color); width: 30%; padding: 8px 12px; font-size: 13px;';
                 
                 let tdValStyle = depth === 0 
                     ? 'word-break: break-word; vertical-align: top;'
-                    : 'word-break: break-word; vertical-align: top; padding: 8px 12px; font-size: 13px; background: white;';
+                    : 'word-break: break-word; vertical-align: top; padding: 8px 12px; font-size: 13px; background: transparent;';
                 
                 html += `<tr><td style="${tdKeyStyle}">${displayKey}</td><td style="${tdValStyle}">${displayValue}</td></tr>`;
             }
@@ -695,7 +780,7 @@
             
             const content = document.getElementById('transactionModalContent');
             document.getElementById('transactionModalTitle').textContent = `Transactions for Account: ${accountId}`;
-            content.innerHTML = '<div style="padding: 20px; text-align: center; color: #64748b;">Loading transactions...</div>';
+            content.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-secondary);">Loading transactions...</div>';
             document.getElementById('transactionModal').style.display = 'flex';
 
             try {
@@ -718,13 +803,13 @@
                         html += '</tbody></table></div>';
                         content.innerHTML = html;
                     } else {
-                        content.innerHTML = '<div style="padding: 20px; text-align: center; color: #64748b;">No transactions found.</div>';
+                        content.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-secondary);">No transactions found.</div>';
                     }
                 } else {
-                    content.innerHTML = '<div style="padding: 20px; text-align: center; color: #dc2626;">Failed to load transaction data.</div>';
+                    content.innerHTML = '<div style="padding: 20px; text-align: center; color: #f87171;">Failed to load transaction data.</div>';
                 }
             } catch (err) {
-                content.innerHTML = '<div style="padding: 20px; text-align: center; color: #dc2626;">Error connecting to server.</div>';
+                content.innerHTML = '<div style="padding: 20px; text-align: center; color: #f87171;">Error connecting to server.</div>';
             }
         }
 
@@ -762,6 +847,150 @@
                 alert("Could not generate SAR. Please try again.");
             }
         }
+
+        // Export Executive Brief PDF
+        document.getElementById('exportBriefBtn').addEventListener('click', () => {
+            if (!reportsCache || reportsCache.length === 0) {
+                alert("No reports to export.");
+                return;
+            }
+
+            const btn = document.getElementById('exportBriefBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="spinner-small" style="display: inline-block; width: 14px; height: 14px; border-width: 2px;"></span> Exporting...';
+            btn.disabled = true;
+
+            const container = document.createElement('div');
+            container.style.padding = '20px 30px';
+            container.style.fontFamily = 'Inter, ui-sans-serif, system-ui, sans-serif';
+            container.style.color = '#111827';
+            container.style.background = '#ffffff';
+            container.style.width = '900px';
+            
+            // To prevent html2canvas clipping, we append to DOM off-screen
+            const wrapper = document.createElement('div');
+            wrapper.style.position = 'absolute';
+            wrapper.style.left = '-9999px';
+            wrapper.style.top = '0';
+            wrapper.appendChild(container);
+            document.body.appendChild(wrapper); 
+
+            let html = `
+                <style>
+                    #pdfContent th, #pdfContent td { border-left: none !important; border-right: none !important; border-top: none !important; }
+                </style>
+                <div id="pdfContent">
+                    <div style="border-bottom: 2px solid #e5e7eb; padding-bottom: 16px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-end;">
+                        <div>
+                            <h1 style="margin: 0; font-size: 26px; color: #111827; letter-spacing: -0.02em;">Executive Compliance Brief</h1>
+                            <p style="margin: 6px 0 0; color: #6b7280; font-size: 13px;">TRACE AI-Generated Report</p>
+                        </div>
+                        <div style="text-align: right; color: #6b7280; font-size: 12px;">
+                            Date: ${new Date().toLocaleDateString()}<br>
+                            Time: ${new Date().toLocaleTimeString()}
+                        </div>
+                    </div>
+            `;
+
+            let high = 0, medium = 0, low = 0;
+            const highRiskTxns = [];
+            reportsCache.forEach(row => {
+                const reportData = row.report || row;
+                const qa = reportData.qa || {};
+                const tx = reportData.transaction || {};
+                const riskLevel = (row.risk_level || qa.risk_level || 'N/A').toUpperCase();
+                
+                if (riskLevel === 'HIGH') {
+                    high++;
+                    highRiskTxns.push(row);
+                }
+                else if (riskLevel === 'MEDIUM') medium++;
+                else if (riskLevel === 'LOW') low++;
+            });
+
+            html += `
+                <div style="display: flex; gap: 20px; margin-bottom: 32px;">
+                    <div style="flex: 1; padding: 20px; border-radius: 8px; border: 1px solid #fca5a5; background: #fef2f2; text-align: center; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                        <div style="font-size: 11px; font-weight: 600; text-transform: uppercase; margin-bottom: 6px; color: #dc2626; letter-spacing: 0.05em;">High Risk</div>
+                        <div style="font-size: 28px; font-weight: bold; color: #991b1b; line-height: 1;">${high}</div>
+                    </div>
+                    <div style="flex: 1; padding: 20px; border-radius: 8px; border: 1px solid #fcd34d; background: #fffbeb; text-align: center; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                        <div style="font-size: 11px; font-weight: 600; text-transform: uppercase; margin-bottom: 6px; color: #d97706; letter-spacing: 0.05em;">Medium Risk</div>
+                        <div style="font-size: 28px; font-weight: bold; color: #92400e; line-height: 1;">${medium}</div>
+                    </div>
+                    <div style="flex: 1; padding: 20px; border-radius: 8px; border: 1px solid #86efac; background: #ecfdf5; text-align: center; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                        <div style="font-size: 11px; font-weight: 600; text-transform: uppercase; margin-bottom: 6px; color: #059669; letter-spacing: 0.05em;">Low Risk</div>
+                        <div style="font-size: 28px; font-weight: bold; color: #065f46; line-height: 1;">${low}</div>
+                    </div>
+                </div>
+            `;
+
+            html += `<h2 style="font-size: 18px; color: #111827; border-bottom: 1px solid #e5e7eb; padding-bottom: 10px; margin-bottom: 20px;">Critical High-Risk Transactions (${highRiskTxns.length})</h2>`;
+            
+            if (highRiskTxns.length > 0) {
+                html += `<table style="width: 100%; border-collapse: collapse; margin-bottom: 24px; font-size: 11.5px;">
+                    <thead>
+                        <tr style="background: #f9fafb;">
+                            <th style="padding: 10px 14px; border-bottom: 2px solid #e5e7eb; text-align: left; font-weight: 600; color: #374151; background: #f9fafb;">Account ID</th>
+                            <th style="padding: 10px 14px; border-bottom: 2px solid #e5e7eb; text-align: left; font-weight: 600; color: #374151; background: #f9fafb;">Transaction ID</th>
+                            <th style="padding: 10px 14px; border-bottom: 2px solid #e5e7eb; text-align: left; font-weight: 600; color: #374151; background: #f9fafb;">Detected Flags</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+                
+                highRiskTxns.forEach(row => {
+                    const reportData = row.report || row;
+                    const qa = reportData.qa || {};
+                    const tx = reportData.transaction || {};
+                    const accountId = row.account_id || tx.account_id || 'N/A';
+                    const txId = row.transaction_id || tx.transaction_id || qa.transaction_id || 'N/A';
+                    
+                    let flagsStr = '-';
+                    const flagsArr = row.flags || qa.flags || [];
+                    if (Array.isArray(flagsArr)) flagsStr = flagsArr.join(', ');
+                    else if (typeof flagsArr === 'string') {
+                        try {
+                            const parsed = JSON.parse(flagsArr);
+                            if (Array.isArray(parsed)) flagsStr = parsed.join(', ');
+                        } catch(e) {}
+                    }
+
+                    html += `
+                        <tr>
+                            <td style="padding: 10px 14px; border-bottom: 1px solid #e5e7eb; font-weight: 600; color: #111827;">${accountId}</td>
+                            <td style="padding: 10px 14px; border-bottom: 1px solid #e5e7eb; color: #4b5563;">${txId}</td>
+                            <td style="padding: 10px 14px; border-bottom: 1px solid #e5e7eb; color: #dc2626;">${flagsStr.replace(/</g, '&lt;')}</td>
+                        </tr>
+                    `;
+                });
+                html += `</tbody></table>`;
+            } else {
+                html += `<p style="color: #6b7280; font-size: 12px; font-style: italic; padding: 14px; background: #f9fafb; border-radius: 8px;">No high-risk transactions detected in this report.</p>`;
+            }
+            html += `</div>`; // Close pdfContent
+
+            container.innerHTML = html;
+
+            const opt = {
+                margin:       10,
+                filename:     'TRACE_Executive_Brief.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true, scrollX: 0, scrollY: 0 },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' }
+            };
+
+            html2pdf().set(opt).from(container).save().then(() => {
+                document.body.removeChild(wrapper);
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }).catch(err => {
+                console.error("PDF generation failed:", err);
+                alert("Failed to generate PDF");
+                if (document.body.contains(wrapper)) document.body.removeChild(wrapper);
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            });
+        });
     </script>
 </body>
 </html>
