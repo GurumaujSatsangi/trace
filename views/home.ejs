@@ -201,6 +201,18 @@
         
         /* Utility */
         .hidden { display: none !important; }
+        
+        /* Voice Recording Animation */
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.1); }
+            70% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); background: rgba(239, 68, 68, 0.1); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); background: transparent; }
+        }
+        #voiceBtn.recording {
+            color: #ef4444;
+            animation: pulse-red 1.5s infinite;
+            border-radius: 50%;
+        }
     </style>
 </head>
 <body>
@@ -250,6 +262,14 @@
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                     </button>
                     <textarea name="message" id="messageInput" placeholder="Ask anything" required rows="1" oninput="this.style.height = ''; this.style.height = Math.min(this.scrollHeight, 200) + 'px'"></textarea>
+                    <button type="button" id="voiceBtn" class="btn-attach" title="Search with Voice" style="display: none;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path>
+                            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                            <line x1="12" y1="19" x2="12" y2="23"></line>
+                            <line x1="8" y1="23" x2="16" y2="23"></line>
+                        </svg>
+                    </button>
                     <button type="submit" id="chatBtn">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
                     </button>
@@ -409,7 +429,6 @@
         });
 
         // Handle Chat Query
-        let conversationContext = [];
         chatForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const messageInput = document.getElementById('messageInput');
@@ -436,7 +455,7 @@
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message, history: conversationContext })
+                    body: JSON.stringify({ message })
                 });
                 const result = await response.json();
 
@@ -455,13 +474,6 @@
                             }
                         }
                         aiHtml += `<div class="verdict-box">${formattedVerdict.join('')}</div>`;
-                        
-                        // Update History Context
-                        conversationContext.push({ role: 'user', content: message });
-                        conversationContext.push({ role: 'assistant', content: result.sql });
-                        if (conversationContext.length > 16) {
-                            conversationContext = conversationContext.slice(-16); // Keep last 8 turns
-                        }
                     }
 
                     const highRiskTxns = result.results.filter(r => r.risk_level && r.risk_level.toUpperCase() === 'HIGH');
@@ -999,6 +1011,81 @@
                 btn.disabled = false;
             });
         });
+
+        // Voice Search Implementation
+        const voiceBtn = document.getElementById('voiceBtn');
+        const messageInput = document.getElementById('messageInput');
+        
+        // Check for browser support
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (SpeechRecognition) {
+            voiceBtn.style.display = 'flex'; // Show button if supported
+            const recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = true;
+            recognition.lang = 'en-US';
+
+            let isRecording = false;
+
+            recognition.onstart = function() {
+                isRecording = true;
+                voiceBtn.classList.add('recording');
+                messageInput.placeholder = "Listening...";
+            };
+
+            recognition.onresult = function(event) {
+                let interimTranscript = '';
+                let finalTranscript = '';
+
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    if (event.results[i].isFinal) {
+                        finalTranscript += event.results[i][0].transcript;
+                    } else {
+                        interimTranscript += event.results[i][0].transcript;
+                    }
+                }
+                
+                // Update input field in real-time
+                if (finalTranscript) {
+                    messageInput.value = finalTranscript;
+                } else {
+                    messageInput.value = interimTranscript;
+                }
+                
+                // Trigger auto-resize
+                messageInput.dispatchEvent(new Event('input'));
+            };
+
+            recognition.onerror = function(event) {
+                console.error("Speech recognition error:", event.error);
+                isRecording = false;
+                voiceBtn.classList.remove('recording');
+                messageInput.placeholder = "Ask anything";
+                
+                if (event.error === 'not-allowed') {
+                    alert("Microphone access is blocked by your browser. Please go to your browser settings (chrome://settings/content/microphone) and explicitly allow localhost:3000 to use your microphone.");
+                }
+            };
+
+            recognition.onend = function() {
+                isRecording = false;
+                voiceBtn.classList.remove('recording');
+                messageInput.placeholder = "Ask anything";
+            };
+
+            voiceBtn.addEventListener('click', () => {
+                if (isRecording) {
+                    recognition.stop();
+                } else {
+                    messageInput.value = ''; // Clear input before starting
+                    try {
+                        recognition.start();
+                    } catch (e) {
+                        console.error("Failed to start recognition", e);
+                    }
+                }
+            });
+        }
     </script>
 </body>
 </html>
